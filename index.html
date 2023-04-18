@@ -4,14 +4,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
     <title>Rock Paper Scissors</title>
   </head>
   <body>
+    <h1>ROCK PAPER SCISSORS</h1>
     <main>
-      <h1>ROCK PAPER SCISSORS</h1>
       <section class="player-container">
-        <h2 class="player">😀</h2>
-        <p class="user-name">Human</p>
+        <h2 class="main-token player">🙂</h2>
+        <h3 class="user-name player-titles">Human</h3>
         <div class>
           <p class="player-wins">Wins: 0</p>
         </div>
@@ -24,17 +25,28 @@
           <p class="token mask">👺</p>
           <p class="token cat">😺</p>
           <p class="token ghost">👻</p>
+          <p class="token alien">👽</p>
         </div>
-        <div class="game standard hidden">
-
-        </div>
-        <div class="game alien hidden">
-
-        </div>
+        <section class="game">
+          <div class="standard hidden">
+            <h3>Standard Game</h3>
+            <p>Rock smashes Scissor</p>
+            <p>Scissors cuts Papper</p>
+            <p>Papper wraps Rock</p>
+          </div>
+          <div class="alien hidden">
+            <h3>Spock Variation</h3>
+            <p>Rock smashes Scissor and crushes Lizard</p>
+            <p>Scissors cuts Papper and decapitates Lizard</p>
+            <p>Papper wraps Rock and disproves Spock</p>
+            <p>Spock vaporises rock and Smashes Scissors</p>
+            <p>Lizard eats Paper and poison's Spock</p>
+          </div>
+        </section>
       </section>
       <section class="computer-container">
-        <h2>🤖</h2>
-        <p>Computer</p>
+        <h2 class="main-token">🤖</h2>
+        <h3 class="player-titles">Computer</h3>
         <div class>
           <p class="computer=wins">Wins: 0</p>
         </div>

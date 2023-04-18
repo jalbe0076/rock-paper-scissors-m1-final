@@ -1,0 +1,73 @@
+/*
+colour specs
+  background edges #449E92
+  background center #29FFE2
+*/
+
+/*GENERAL*/
+
+* {
+  font-family: 'Shadows Into Light', cursive;
+  text-align: center;
+}
+
+p {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 2.4rem;
+  margin: -0.7rem 0 1.8rem 0;
+}
+
+h1,
+.token {
+  font-size: 3rem;
+}
+
+h3 {
+  font-size: 1.8rem;
+}
+
+.main-token {
+  font-size: 4rem;
+  margin: 0;
+}
+
+
+/* PAGE LAYOUT */
+
+body {
+  height: 100%;
+  background: linear-gradient(
+    to right, #449E92, #29FFE2, #29FFE2, #29FFE2, #29FFE2, #449E92
+  );
+}
+
+main {
+  display: flex;
+  justify-content: space-between;
+}
+
+.player-container,
+.computer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 15%;
+}
+
+.game, 
+.player-token {
+  display: flex;
+  justify-content: space-around;
+}
+
+/* VISIBILITY AND ANIMATIONS */
+
+.hidden {
+
+}
+
+
+
