@@ -1,0 +1,124 @@
+/*
+colour specs
+  background edges #1B3A4B
+  background center #006466
+*/
+
+/*GENERAL*/
+
+* {
+  font-family: 'Shadows Into Light', cursive;
+  text-align: center;
+  color: white;
+  margin: 0;
+  /* border: black 3px solid; */
+}
+
+p {
+  font-size: 1.3rem;
+}
+
+h2 {
+  font-size: 2.4rem;
+  margin: 3em 0 0 0;
+}
+
+h1,
+.token {
+  margin-top: 1rem;
+  font-size: 3rem;
+}
+
+h3 {
+  font-size: 1.8rem;
+  margin: 0.3rem;
+}
+
+.main-token {
+  font-size: 4rem;
+}
+
+.standard-game,
+.alien-game {
+  width: 398px;
+  height: 250px;
+  border: none;
+  background-color: #4D194D;
+  border-radius: 50px;
+}
+
+/* PAGE LAYOUT */
+
+html {
+  background: linear-gradient(
+    to right, #1B3A4B 10%, #006466, #006466,  #1B3A4B 90%
+  );
+}
+
+body {
+  height: 98vh;
+}
+
+.side-banners {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.player-container,
+.computer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 15%;
+}
+
+main {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+width: 70%;
+height: 80vh;
+}
+
+.game-selection {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  margin: 10% 0 5% 0;
+}
+
+.player-token {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+}
+
+/* VISIBILITY AND ANIMATIONS */
+
+.hidden {
+  display: none;
+}
+
+.hover:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+button {
+  background-color: #4D194D;
+  border: none;
+  font-size: 1.5rem;
+  padding: 0.3rem 4rem;
+  border-radius: 50px;
+}
+
+img {
+  height: auto;
+  max-width: 15%;
+  margin: 2rem 0.5rem;
+}
+
+
+
