@@ -35,8 +35,22 @@ function getPlayerWepon(gameWepons, event) {
   }
 }
 
-function getStandardGameLogic(player, comp) {
-  console.log(indexOf(player))
+function getGameLogic(player, comp) {
+  var logicWeapons = currentGame.slice(0, currentGame.length);
+  var cutLogicWeapons = logicWeapons.slice(0, player);
+  
+  for (var i = 0; i < cutLogicWeapons.length; i++) {
+    logicWeapons.push(cutLogicWeapons[i])
+  }
+  
+  for (var i = player; i < logicWeapons.length; i += 2) {
+    if (player === comp) {
+      return 'tie'
+    } else if (i === comp) {
+      return 'player wins'
+    }
+  }
+  return 'pc wins'
 }
 
 function getGameVersion(event) {
