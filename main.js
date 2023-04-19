@@ -26,16 +26,25 @@ function getRandomWeapon(numberOfWeapons) {
   return Math.floor(Math.random() * numberOfWeapons.length);
 }
 
-function getStandardGameLogic(player, comp) {
+function getPlayerWepon(gameWepons, event) {
+  var userSelection = event.target.children;
+  for (var i = 0; i < gameWepons.length; i++) {
+    if (userSelection.id === gameWepons[i]) {
+      return i;
+    }
+  }
+}
 
+function getStandardGameLogic(player, comp) {
+  console.log(indexOf(player))
 }
 
 function getGameVersion(event) {
   currentGame = [];
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
-    currentGame = gameOptions.slice(0, 5)
-  } else if (event.target.classList.contains('alien-game') || event.target.parentNode.classList.contains('alien-game')) {
     currentGame = gameOptions.slice(0, 3)
+  } else if (event.target.classList.contains('alien-game') || event.target.parentNode.classList.contains('alien-game')) {
+    currentGame = gameOptions.slice(0, 5)
   }
   return currentGame;
 }
