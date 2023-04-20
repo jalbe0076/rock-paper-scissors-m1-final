@@ -4,29 +4,28 @@ var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
 var players = {};
 var gameSelected = false;
-console.log(players)
 
-  var gameVersion = document.querySelector('.game-selection');
-  var gameButton = document.querySelector('button');
-  var playerToken = document.querySelector('.player-token');
-  var subtitle = document.querySelector('.user-action')
-  var playerBanner = {
-    token: document.querySelector('#token'),
-    name: document.querySelector('.user-name'),
-    score: document.querySelector('.player-wins'),
-  };
-  var computerBanner = {
-    token: document.querySelector('.computer-token'),
-    name: document.querySelector('.computer-title'),
-    score: document.querySelector('.computer-score')
-  }
-  var computerScore = document.querySelector('computer-wins');
-  var standardGame = document.querySelector('.standard-game');
-  var variationGame = document.querySelector('.alien-game');
-  var playGame = document.querySelector('#play');
-  var playerScore = document.querySelector('.player-score');
- 
-  gameButton.disabled = true;
+var gameVersion = document.querySelector('.game-selection');
+var gameButton = document.querySelector('button');
+var playerToken = document.querySelector('.player-token');
+var subtitle = document.querySelector('.user-action')
+var playerBanner = {
+  token: document.querySelector('#token'),
+  name: document.querySelector('.user-name'),
+  score: document.querySelector('.player-wins'),
+};
+var computerBanner = {
+  token: document.querySelector('.computer-token'),
+  name: document.querySelector('.computer-title'),
+  score: document.querySelector('.computer-score')
+}
+var computerScore = document.querySelector('computer-wins');
+var standardGame = document.querySelector('.standard-game');
+var variationGame = document.querySelector('.alien-game');
+var playGame = document.querySelector('#play');
+var playerScore = document.querySelector('.player-score');
+
+gameButton.disabled = true;
 
 // EVENT LISTENERS 
 
@@ -45,8 +44,15 @@ gameVersion.addEventListener('click', function(event) {
 });
 
 gameButton.addEventListener('click', function() {
-  toggleGameView()
+  toggleGameView();
 });
+
+playGame.addEventListener('click', function(event) {
+  var playerSelection = getPlayerOption(currentGame, event);
+  var computerSelection = getRandomNumber(currentGame);
+
+  getGameLogic(playerSelection, computerSelection);
+})
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
 
@@ -55,7 +61,8 @@ function getRandomNumber(numberOfOptions) {
 }
 
 function getPlayerOption(gameOptions, event) {
-  var userSelection = event.target.children;
+  var userSelection = event.target;
+
   for (var i = 0; i < gameOptions.length; i++) {
     if (userSelection.id === gameOptions[i]) {
       return i;
@@ -93,7 +100,7 @@ function getGameVersion(event) {
 }
 
 function enableButton() {
-  if (players.user.token.length && gameSelected) {
+  if (Object.keys(players).length && gameSelected) {
     gameButton.disabled = false;
     gameButton.style.backgroundColor = '#4D194D'
   }
@@ -102,6 +109,10 @@ function enableButton() {
 function getGameLogic(player, comp) {
   var logicOptions = currentGame.slice(0, currentGame.length);
   var cutLogicOptions = logicOptions.slice(0, player);
+  
+  if (player > comp) {
+    comp += logicOptions.length;
+  }
 
   for (var i = 0; i < cutLogicOptions.length; i++) {
     logicOptions.push(cutLogicOptions[i])
@@ -110,7 +121,7 @@ function getGameLogic(player, comp) {
   for (var i = player; i < logicOptions.length; i += 2) {
     if (player === comp) {
       return 'tie'
-    } else if (i === comp) {
+    } else if (i === (comp)) {
       return 'player wins'
     }
   }
