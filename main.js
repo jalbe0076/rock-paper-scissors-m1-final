@@ -14,7 +14,13 @@ var availableTokens = {
   Clown: '🤡',
   Surprise: '💩'
 };
-// console.log(availableTokens.keys)
+var availableOptions = {
+  rock: './assets/rock.png',
+  paper: './assets/lines-paper.png',
+  scissor: './assets/scissors.png',
+  spock: './assets/flat-alien.png',
+  lizard: './assets/flat-lizard.png'
+};
 
 var gameVersion = document.querySelector('.game-selection');
 var gameButton = document.querySelector('button');
@@ -40,7 +46,9 @@ gameButton.disabled = true;
 
 // EVENT LISTENERS 
 
-window.addEventListener('load', getAvailableTokens);
+window.addEventListener('load', function() {
+  getAvailableTokens(availableTokens)
+});
 
 playerToken.addEventListener('click', function(event) {
   if (event.target.classList.contains('token')) {
@@ -58,6 +66,7 @@ gameVersion.addEventListener('click', function(event) {
 
 gameButton.addEventListener('click', function() {
   toggleGameView();
+  displayPlayerOptions(availableOptions)
 });
 
 playGame.addEventListener('click', function(event) {
@@ -73,10 +82,23 @@ function getRandomNumber(numberOfOptions) {
   return Math.floor(Math.random() * numberOfOptions.length);
 }
 
-function getAvailableTokens() {
-    for (var i = 0; i < Object.keys(availableTokens).length; i++) {
-      playerToken.innerHTML += `<p class="token hover" id="${Object.keys(availableTokens)[i]}">${Object.values(availableTokens)[i]}</p>`;
-    }
+function getAvailableTokens(tokens) {
+  for (var i = 0; i < Object.keys(tokens).length; i++) {
+    playerToken.innerHTML += `<p class="token hover" id="${Object.keys(tokens)[i]}">${Object.values(availableTokens)[i]}</p>`;
+  }
+}
+
+function displayPlayerOptions(options) {
+  playGame.innerHTML = '';
+  var numberOfCurrentOptions = Object.keys(availableOptions).length;
+
+  if (currentGame.length < 5) {
+    numberOfCurrentOptions -= 2;
+  } 
+
+  for (var i = 0; i < numberOfCurrentOptions; i++) {
+    playGame.innerHTML += `<img src="${Object.values(options)[i]}" alt="play ${Object.keys(options)[i]}" class="hover" id="${Object.keys(options)[i]}">`;
+  }
 }
 
 function getPlayerOption(gameOptions, event) {
@@ -167,11 +189,6 @@ function toggleGameView() {
   playGame.classList.toggle('hidden');
   playerToken.classList.toggle('hidden');
   gameVersion.classList.toggle('hidden');
-
-  if (currentGame.length === 5) {
-    playGame.children[3].classList.toggle('hidden');
-    playGame.children[4].classList.toggle('hidden');
-  }
 
   if (!playGame.classList.contains('hidden')) {
     gameButton.innerText = `NEW GAME`;
