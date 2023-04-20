@@ -4,6 +4,17 @@ var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
 var players = {};
 var gameSelected = false;
+var availableTokens = {
+  Professor: '🧐',
+  Devil: '😈',
+  Goblin: '👺',
+  Cat: '😼',
+  Ghost: '👻',
+  Alien: '👽',
+  Clown: '🤡',
+  Surprise: '💩'
+};
+// console.log(availableTokens.keys)
 
 var gameVersion = document.querySelector('.game-selection');
 var gameButton = document.querySelector('button');
@@ -29,6 +40,8 @@ gameButton.disabled = true;
 
 // EVENT LISTENERS 
 
+window.addEventListener('load', getAvailableTokens);
+
 playerToken.addEventListener('click', function(event) {
   if (event.target.classList.contains('token')) {
     players = populatePlayerBanners(event);
@@ -50,14 +63,20 @@ gameButton.addEventListener('click', function() {
 playGame.addEventListener('click', function(event) {
   var playerSelection = getPlayerOption(currentGame, event);
   var computerSelection = getRandomNumber(currentGame);
-
   getGameLogic(playerSelection, computerSelection);
+  displayGameRound(playerSelection, computerSelection, currentGame);
 })
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
 
 function getRandomNumber(numberOfOptions) {
   return Math.floor(Math.random() * numberOfOptions.length);
+}
+
+function getAvailableTokens() {
+    for (var i = 0; i < Object.keys(availableTokens).length; i++) {
+      playerToken.innerHTML += `<p class="token hover" id="${Object.keys(availableTokens)[i]}">${Object.values(availableTokens)[i]}</p>`;
+    }
 }
 
 function getPlayerOption(gameOptions, event) {
@@ -160,3 +179,7 @@ function toggleGameView() {
     gameButton.innerText = `PLAY!`;
   } 
 }
+
+function displayGameRound(player, computer) {
+
+} 
