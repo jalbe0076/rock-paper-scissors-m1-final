@@ -2,12 +2,9 @@
 
 var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
-var players = {
-  user: { token: '', name: '', score: 0 }, 
-  comp: { token: '🤖', name: 'Computer', score: 0 }
-};
+var players = {};
 var gameSelected = false;
-
+console.log(players)
 
   var gameVersion = document.querySelector('.game-selection');
   var gameButton = document.querySelector('button');
@@ -29,14 +26,15 @@ var gameSelected = false;
   var playGame = document.querySelector('#play');
   var playerScore = document.querySelector('.player-score');
  
-
   gameButton.disabled = true;
 
 // EVENT LISTENERS 
 
 playerToken.addEventListener('click', function(event) {
-  createPlayer(event, players);
-  enableButton();
+  if (event.target.classList.contains('token')) {
+    players = populatePlayerBanners(event);
+    enableButton();
+  } 
 });
 
 gameVersion.addEventListener('click', function(event) {
@@ -52,32 +50,36 @@ gameButton.addEventListener('click', function() {
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
 
-function getRandomWeapon(numberOfOptions) {
+function getRandomNumber(numberOfOptions) {
   return Math.floor(Math.random() * numberOfOptions.length);
 }
 
-function getPlayerWepon(gameWepons, event) {
+function getPlayerOption(gameOptions, event) {
   var userSelection = event.target.children;
-  for (var i = 0; i < gameWepons.length; i++) {
-    if (userSelection.id === gameWepons[i]) {
+  for (var i = 0; i < gameOptions.length; i++) {
+    if (userSelection.id === gameOptions[i]) {
       return i;
     }
   }
 }
 
-function createPlayer(event, players) {
-  if (event.target.classList.contains('token')) {
-    players.user.token = event.target.innerText;
-    players.user.name = event.target.id;
+function createPlayer(token, name) {
+  return {
+    user: { token: token, name: name, score: 0 }, 
+    comp: { token: '🤖', name: 'Computer', score: 0 }
+  };
+}
 
-    playerBanner.token.innerText = `${players.user.token}`;
-    playerBanner.name.innerText = `${players.user.name}`;
-    playerScore.innerText = `Score: ${players.user.score}`;
-    computerBanner.token.innerText = `${players.comp.token}`;
-    computerBanner.name.innerText = `${players.comp.name}`;
-    computerBanner.score.innerText = `Score: ${players.comp.score}`;
-  }
-  return players;
+function populatePlayerBanners(event) {
+  var player = createPlayer(event.target.innerText, event.target.id);
+  playerBanner.token.innerText = `${player.user.token}`;
+  playerBanner.name.innerText = `${player.user.name}`;
+  playerScore.innerText = `Score: ${player.user.score}`;
+  computerBanner.token.innerText = `${player.comp.token}`;
+  computerBanner.name.innerText = `${player.comp.name}`;
+  computerBanner.score.innerText = `Score: ${player.comp.score}`;
+
+  return player;
 }
 
 function getGameVersion(event) {
