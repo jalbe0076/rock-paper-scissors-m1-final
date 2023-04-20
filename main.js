@@ -3,49 +3,57 @@
 var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
 var players = {
-  user: { token: '🙂', name: 'Human', score: 0 }, 
-  comp: { name: 'Computer', score: 0 }
+  user: { token: '', name: '', score: 0 }, 
+  comp: { token: '🤖', name: 'Computer', score: 0 }
 };
+var gameSelected = false;
+
 
   var gameVersion = document.querySelector('.game-selection');
   var gameButton = document.querySelector('button');
   var playerToken = document.querySelector('.player-token');
+  var subtitle = document.querySelector('.user-action')
   var playerBanner = {
     token: document.querySelector('#token'),
     name: document.querySelector('.user-name'),
     score: document.querySelector('.player-wins'),
   };
+  var computerBanner = {
+    token: document.querySelector('.computer-token'),
+    name: document.querySelector('.computer-title'),
+    score: document.querySelector('.computer-score')
+  }
   var computerScore = document.querySelector('computer-wins');
   var standardGame = document.querySelector('.standard-game');
-  var variationGame = document.querySelector('.alien-game')
-                      // var gameArea = document.querySelector('main');
+  var variationGame = document.querySelector('.alien-game');
+  var playGame = document.querySelector('#play');
+  var playerScore = document.querySelector('.player-score');
+ 
+
   gameButton.disabled = true;
 
 // EVENT LISTENERS 
 
 playerToken.addEventListener('click', function(event) {
-  adjustPlayer(event, players);
+  createPlayer(event, players);
+  enableButton();
 });
 
 gameVersion.addEventListener('click', function(event) {
+  gameSelected = true;
   enableGameBackgroundToggle(event);
   enableButton();
   getGameVersion(event);
 });
 
-gameButton.addEventListener('click', function(event) {
-
+gameButton.addEventListener('click', function() {
+  toggleGameView()
 });
-
-// gameArea.addEventListener('click', function(event) {
-  // console.log(event)
-  // getGameVersion(event);
-// });
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
 
-function getRandomWeapon(numberOfWeapons) {
-  return Math.floor(Math.random() * numberOfWeapons.length);
+function getRandomWeapon(numberOfOptions) {
+  return Math.floor(Math.random() * numberOfOptions.length);
 }
 
 function getPlayerWepon(gameWepons, event) {
@@ -57,31 +65,19 @@ function getPlayerWepon(gameWepons, event) {
   }
 }
 
-function adjustPlayer(event, players) {
+function createPlayer(event, players) {
   if (event.target.classList.contains('token')) {
     players.user.token = event.target.innerText;
     players.user.name = event.target.id;
+
     playerBanner.token.innerText = `${players.user.token}`;
     playerBanner.name.innerText = `${players.user.name}`;
+    playerScore.innerText = `Score: ${players.user.score}`;
+    computerBanner.token.innerText = `${players.comp.token}`;
+    computerBanner.name.innerText = `${players.comp.name}`;
+    computerBanner.score.innerText = `Score: ${players.comp.score}`;
   }
-}
-
-function getGameLogic(player, comp) {
-  var logicWeapons = currentGame.slice(0, currentGame.length);
-  var cutLogicWeapons = logicWeapons.slice(0, player);
-
-  for (var i = 0; i < cutLogicWeapons.length; i++) {
-    logicWeapons.push(cutLogicWeapons[i])
-  }
-  
-  for (var i = player; i < logicWeapons.length; i += 2) {
-    if (player === comp) {
-      return 'tie'
-    } else if (i === comp) {
-      return 'player wins'
-    }
-  }
-  return 'pc wins'
+  return players;
 }
 
 function getGameVersion(event) {
@@ -95,8 +91,28 @@ function getGameVersion(event) {
 }
 
 function enableButton() {
-  gameButton.disabled = false;
-  gameButton.style.backgroundColor = '#4D194D'
+  if (players.user.token.length && gameSelected) {
+    gameButton.disabled = false;
+    gameButton.style.backgroundColor = '#4D194D'
+  }
+}
+
+function getGameLogic(player, comp) {
+  var logicOptions = currentGame.slice(0, currentGame.length);
+  var cutLogicOptions = logicOptions.slice(0, player);
+
+  for (var i = 0; i < cutLogicOptions.length; i++) {
+    logicOptions.push(cutLogicOptions[i])
+  }
+  
+  for (var i = player; i < logicOptions.length; i += 2) {
+    if (player === comp) {
+      return 'tie'
+    } else if (i === comp) {
+      return 'player wins'
+    }
+  }
+  return 'pc wins'
 }
 
 function enableGameBackgroundToggle(event) {
@@ -110,5 +126,24 @@ function enableGameBackgroundToggle(event) {
 }
 
 function toggleGameView() {
+  if (playGame.classList.contains('hidden')) {
+    subtitle.innerText = `Select your option!`;
+  } else {
+    subtitle.innerText = `Select your avatar & game!`;
+  }
 
+  playGame.classList.toggle('hidden');
+  playerToken.classList.toggle('hidden');
+  gameVersion.classList.toggle('hidden');
+
+  if (currentGame.length === 5) {
+    playGame.children[3].classList.toggle('hidden');
+    playGame.children[4].classList.toggle('hidden');
+  }
+
+  if (!playGame.classList.contains('hidden')) {
+    gameButton.innerText = `NEW GAME`;
+  } else {
+    gameButton.innerText = `PLAY!`;
+  } 
 }
