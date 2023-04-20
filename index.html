@@ -11,28 +11,28 @@
     <h1>ROCK PAPER SCISSORS</h1>
     <section class="side-banners">
       <section class="player-container">
-        <h2 class="main-token player">🙂</h2>
-        <h3 class="user-name player-titles">Human</h3>
+        <h2 class="main-token player" id="token"></h2>
+        <h3 class="user-name player-titles"></h3>
         <div class>
-          <p class="player-wins">Wins: 0</p>
+          <p class="player-score score"></p>
         </div>
       </section>
       <main>
         <h2 class="user-action">Select your avatar & game!</h2>
         <div class="hidden" id="play">
-          <img src="./assets/rock.png" alt="play rock" class="hover">
-          <img src="./assets/lines-paper.png" alt="play paper" class="hover">
-          <img src="./assets/scissors copy.png" alt="play scissor" class="hover">
-          <img src="./assets/flat-lizard.png" alt="play lizard" class="hover hidden">
-          <img src="./assets/flat-alien.png" alt="play alien" class="hover hidden">
+          <img src="./assets/rock.png" alt="play rock" class="hover" id="rock">
+          <img src="./assets/lines-paper.png" alt="play paper" class="hover" id="paper">
+          <img src="./assets/scissors copy.png" alt="play scissor" class="hover" id="scissor">
+          <img src="./assets/flat-alien.png" alt="play spock" class="hover hidden" id="spock">
+          <img src="./assets/flat-lizard.png" alt="play lizard" class="hover hidden" id="lizard">
         </div>
         <div class="player-token">
-          <p class="token hover default">🙂</p>
-          <p class="token hover devil">😈</p>
-          <p class="token hover mask">👺</p>
-          <p class="token hover cat">😺</p>
-          <p class="token hover ghost">👻</p>
-          <p class="token hover alien">👽</p>
+          <p class="token hover" id="Human">🙂</p>
+          <p class="token hover" id="Devil">😈</p>
+          <p class="token hover" id="Mask">👺</p>
+          <p class="token hover" id="Cat">😺</p>
+          <p class="token hover" id="Ghost">👻</p>
+          <p class="token hover" id="Alien">👽</p>
         </div>
         <section class="game-selection">
           <div class="standard-game hover">
@@ -46,19 +46,20 @@
             <p>Rock smashes Scissor and crushes Lizard</p>
             <p>Scissors cuts Papper and decapitates Lizard</p>
             <p>Papper wraps Rock and disproves Spock</p>
-            <p>Spock vaporises rock and Smashes Scissors</p>
+            <p>Spock vaporises rock and smashes Scissors</p>
             <p>Lizard eats Paper and poison's Spock</p>
           </div>
         </section>
         <button class="play hover">PLAY!</button>
       </main>
       <section class="computer-container">
-        <h2 class="main-token">🤖</h2>
-        <h3 class="player-titles">Computer</h3>
+        <h2 class="main-token computer-token"></h2>
+        <h3 class="player-titles computer-title"></h3>
         <div class>
-          <p class="computer=wins">Wins: 0</p>
+          <p class="computer-score score"></p>
         </div>
       </section>
     </section>
+    <script src="./main.js"></script>
   </body>
 </html>
