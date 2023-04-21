@@ -21,11 +21,16 @@ var availableOptions = {
   spock: './assets/flat-alien.png',
   lizard: './assets/flat-lizard.png'
 };
+var numberOfRounds = 3;
 
 var gameVersion = document.querySelector('.game-selection');
-var gameButton = document.querySelector('button');
+var gameButton = document.querySelector('.play');
+var roundButtons = document.querySelector('.btn-round');
+var round3 = document.querySelector('#round3');
+var round5 = document.querySelector('#round5');
+var round7 = document.querySelector('#round7');
 var playerToken = document.querySelector('.player-token');
-var subtitle = document.querySelector('.user-action')
+var subtitle = document.querySelector('.user-action');
 var playerBanner = {
   token: document.querySelector('#token'),
   name: document.querySelector('.user-name'),
@@ -43,6 +48,7 @@ var playGame = document.querySelector('#play');
 // var playerScore = document.querySelector('.player-score');
 
 gameButton.disabled = true;
+round3.style.backgroundColor = '#4D194D';
 
 // EVENT LISTENERS 
 
@@ -67,7 +73,6 @@ gameVersion.addEventListener('click', function(event) {
 gameButton.addEventListener('click', function() {
   toggleGameView();
   displayPlayerOptions(availableOptions);
-  console.log(gameButton.innerText === 'NEW GAME')
   if (gameButton.innerText !== 'NEW GAME') {
     resetScore(players);
   }
@@ -79,9 +84,18 @@ playGame.addEventListener('click', function(event) {
     var computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, availableOptions, players);
     displayGameRound(playerSelection, computerSelection, availableOptions);
-    setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
-    
+    var checkGameContinue = playNumberOfRounds(numberOfRounds, players);
+    if (checkGameContinue) {
+      setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
+    } 
+    // else if (players.user.score !== numberOfRounds) {
+    //   setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
+    // }
   }
+});
+
+roundButtons.addEventListener('click', function(event) {
+  getNumberOfRounds(event);
 });
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
@@ -197,6 +211,7 @@ function toggleGameView() {
   playGame.classList.toggle('hidden');
   playerToken.classList.toggle('hidden');
   gameVersion.classList.toggle('hidden');
+  roundButtons.classList.toggle('hidden');
 
   if (!playGame.classList.contains('hidden')) {
     gameButton.innerText = `NEW GAME`;
@@ -231,3 +246,52 @@ function resetScore(players) {
   playerBanner.score.innerText = `Score: ${players.user.score}`;
   computerBanner.score.innerText = `Score: ${players.comp.score}`;
 }
+
+function getNumberOfRounds(event) {
+  if (event.target.id === 'round3') {
+    numberOfRounds = 3;
+    round3.style.backgroundColor = '#4D194D';
+    round5.style.backgroundColor = '#4D194D65';
+    round7.style.backgroundColor = '#4D194D65';
+  } else if (event.target.id === 'round5') {
+    numberOfRounds = 5;
+    round5.style.backgroundColor = '#4D194D';
+    round3.style.backgroundColor = '#4D194D65';
+    round7.style.backgroundColor = '#4D194D65';
+  } else if (event.target.id === 'round7') {
+    numberOfRounds = 7;
+    round7.style.backgroundColor = '#4D194D';
+    round3.style.backgroundColor = '#4D194D65';
+    round5.style.backgroundColor = '#4D194D65';
+  }
+  return numberOfRounds;
+}
+
+function determineWinner(players) {
+  var playerWinner = false;
+  if (players.user.score > players.comp.score) {
+    playerWinner = true;
+  }
+  return playerWinner;
+}
+
+function playNumberOfRounds(numberOfRounds, players) {
+  if (players.user.score === numberOfRounds || players.comp.score === numberOfRounds) {
+    var winner = determineWinner(players);
+    displayWinner(winner, players);
+    return false;
+  }
+  return true;
+}
+
+function displayWinner(winner, players) {
+  playGame.innerHTML = '';
+  subtitle.innerText = '';
+  if (winner) {
+    console.log('player wins')
+    playGame.innerHTML += `<p id="winner">${players.user.token} WINS!!!</p>`;
+  } else {
+    console.log('PC WINS')
+    playGame.innerHTML += `<p id="winner">GAME OVER <br>${players.comp.token} WINS!!!</p>`;
+  }
+} 
