@@ -4,9 +4,9 @@ var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
 var game = {
   players: {},
+  gameSelected: false
 };
 
-var gameSelected = false;
 var availableTokens = {
   Professor: '🧐',
   Devil: '😈',
@@ -66,7 +66,7 @@ playerToken.addEventListener('click', function(event) {
 });
 
 gameVersion.addEventListener('click', function(event) {
-  gameSelected = true;
+  game.gameSelected = true;
   enableGameBackgroundToggle(event);
   enableButton();
   getGameVersion(event);
@@ -163,7 +163,7 @@ function getGameVersion(event) {
 }
 
 function enableButton() {
-  if (Object.keys(game.players).length && gameSelected) {
+  if (Object.keys(game.players).length && game.gameSelected) {
     gameButton.disabled = false;
     gameButton.style.backgroundColor = '#4D194D'
   }
