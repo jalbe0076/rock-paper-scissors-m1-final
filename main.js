@@ -1,8 +1,7 @@
 // VARIABLES & DATA MODEL
 
-var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
-var game = {
+var gameData = {
   players: {},
   gameSelected: false,
   availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' },
@@ -34,7 +33,6 @@ var computerBanner = {
   name: document.querySelector('.computer-title'),
   score: document.querySelector('.computer-score')
 };
-var computerScore = document.querySelector('computer-wins');
 var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
@@ -45,28 +43,28 @@ round3.style.backgroundColor = '#4D194D';
 // EVENT LISTENERS 
 
 window.addEventListener('load', function() {
-  getAvailableTokens(game);
+  getAvailableTokens(gameData);
 });
 
 playerToken.addEventListener('click', function(event) {
   if (event.target.classList.contains('token')) {
-    game.players = populatePlayerBanners(event);
-    enableButton();
+    gameData.players = populatePlayerBanners(event);
+    enableButton(gameData);
   } 
 });
 
 gameVersion.addEventListener('click', function(event) {
-  game.gameSelected = true;
+  gameData.gameSelected = true;
   enableGameBackgroundToggle(event);
-  enableButton();
-  getGameVersion(event);
+  enableButton(gameData);
+  getGameVersion(event, gameData);
 });
 
 gameButton.addEventListener('click', function() {
   toggleGameView();
-  displayPlayerOptions(game);
+  displayPlayerOptions(gameData);
   if (gameButton.innerText !== 'NEW GAME') {
-    resetScore(game);
+    resetScore(gameData);
   }
 });
 
@@ -74,17 +72,18 @@ playGame.addEventListener('click', function(event) {
   if (event.target.classList.contains('option')) {
     var playerSelection = getPlayerOption(currentGame, event);
     var computerSelection = getRandomNumber(currentGame);
-    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, game);
-    displayGameRound(playerSelection, computerSelection, game);
-    var checkGameContinue = playNumberOfRounds(game);
+    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, gameData);
+    displayGameRound(playerSelection, computerSelection, gameData);
+    var checkGameContinue = playNumberOfRounds(gameData);
+
     if (checkGameContinue) {
-      setTimeout(function() { displayPlayerOptions(game) }, 1500);
+      setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
     } 
   }
 });
 
 roundButtons.addEventListener('click', function(event) {
-  getNumberOfRounds(event);
+  getNumberOfRounds(event, gameData);
 });
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
@@ -113,11 +112,11 @@ function displayPlayerOptions(game) {
   }
 }
 
-function getPlayerOption(gameOptions, event) {
+function getPlayerOption(currentGame, event) {
   var userSelection = event.target;
 
-  for (var i = 0; i < gameOptions.length; i++) {
-    if (userSelection.id === gameOptions[i]) {
+  for (var i = 0; i < currentGame.length; i++) {
+    if (userSelection.id === currentGame[i]) {
       return i;
     }
   }
@@ -142,7 +141,8 @@ function populatePlayerBanners(event) {
   return player;
 }
 
-function getGameVersion(event) {
+function getGameVersion(event, game) {
+  var gameOptions = Object.keys(game.playableGameOptions);
   currentGame = [];
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
     currentGame = gameOptions.slice(0, 3)
@@ -152,7 +152,7 @@ function getGameVersion(event) {
   return currentGame;
 }
 
-function enableButton() {
+function enableButton(game) {
   if (Object.keys(game.players).length && game.gameSelected) {
     gameButton.disabled = false;
     gameButton.style.backgroundColor = '#4D194D'
@@ -239,7 +239,7 @@ function resetScore(game) {
   computerBanner.score.innerText = `Score: ${game.players.comp.score}`;
 }
 
-function getNumberOfRounds(event) {
+function getNumberOfRounds(event, game) {
   if (event.target.id === 'round3') {
     game.numberOfRounds = 3;
     round3.style.backgroundColor = '#4D194D';
