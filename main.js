@@ -2,7 +2,10 @@
 
 var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
-var players = {};
+var game = {
+  players: {},
+};
+
 var gameSelected = false;
 var availableTokens = {
   Professor: '🧐',
@@ -45,7 +48,6 @@ var computerScore = document.querySelector('computer-wins');
 var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
-// var playerScore = document.querySelector('.player-score');
 
 gameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
@@ -58,7 +60,7 @@ window.addEventListener('load', function() {
 
 playerToken.addEventListener('click', function(event) {
   if (event.target.classList.contains('token')) {
-    players = populatePlayerBanners(event);
+    game.players = populatePlayerBanners(event);
     enableButton();
   } 
 });
@@ -74,7 +76,7 @@ gameButton.addEventListener('click', function() {
   toggleGameView();
   displayPlayerOptions(availableOptions);
   if (gameButton.innerText !== 'NEW GAME') {
-    resetScore(players);
+    resetScore(game);
   }
 });
 
@@ -82,15 +84,12 @@ playGame.addEventListener('click', function(event) {
   if (event.target.classList.contains('option')) {
     var playerSelection = getPlayerOption(currentGame, event);
     var computerSelection = getRandomNumber(currentGame);
-    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, availableOptions, players);
+    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, availableOptions, game);
     displayGameRound(playerSelection, computerSelection, availableOptions);
-    var checkGameContinue = playNumberOfRounds(numberOfRounds, players);
+    var checkGameContinue = playNumberOfRounds(numberOfRounds, game);
     if (checkGameContinue) {
       setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
     } 
-    // else if (players.user.score !== numberOfRounds) {
-    //   setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
-    // }
   }
 });
 
@@ -164,7 +163,7 @@ function getGameVersion(event) {
 }
 
 function enableButton() {
-  if (Object.keys(players).length && gameSelected) {
+  if (Object.keys(game.players).length && gameSelected) {
     gameButton.disabled = false;
     gameButton.style.backgroundColor = '#4D194D'
   }
@@ -226,25 +225,25 @@ function displayGameRound(player, computer, options) {
   playGame.innerHTML += `<img src="${Object.values(options)[computer]}" alt="play ${Object.keys(options)[computer]}" class="hover" id="${Object.keys(options)[computer]}">`;
 } 
 
-function getRoundWinner(winner, player, computer, options, players) {
+function getRoundWinner(winner, player, computer, options, game) {
   if (winner === 'tie') {
     subtitle.innerText = `This round was a tie`;
   } else if (winner === 'player') {
-    players.user.score += 1;
+    game.players.user.score += 1;
     subtitle.innerText = `${Object.keys(options)[player]} beats ${Object.keys(options)[computer]}`;
-    playerBanner.score.innerText = `Score: ${players.user.score}`;
+    playerBanner.score.innerText = `Score: ${game.players.user.score}`;
   } else {
-    players.comp.score += 1;
+    game.players.comp.score += 1;
     subtitle.innerText = `${Object.keys(options)[player]} looses against ${Object.keys(options)[computer]}`;
-    computerBanner.score.innerText = `Score: ${players.comp.score}`;
+    computerBanner.score.innerText = `Score: ${game.players.comp.score}`;
   }
 }
 
-function resetScore(players) {
-  players.user.score = 0;
-  players.comp.score = 0;
-  playerBanner.score.innerText = `Score: ${players.user.score}`;
-  computerBanner.score.innerText = `Score: ${players.comp.score}`;
+function resetScore(game) {
+  game.players.user.score = 0;
+  game.players.comp.score = 0;
+  playerBanner.score.innerText = `Score: ${game.players.user.score}`;
+  computerBanner.score.innerText = `Score: ${game.players.comp.score}`;
 }
 
 function getNumberOfRounds(event) {
@@ -267,31 +266,29 @@ function getNumberOfRounds(event) {
   return numberOfRounds;
 }
 
-function determineWinner(players) {
+function determineWinner(game) {
   var playerWinner = false;
-  if (players.user.score > players.comp.score) {
+  if (game.players.user.score > game.players.comp.score) {
     playerWinner = true;
   }
   return playerWinner;
 }
 
-function playNumberOfRounds(numberOfRounds, players) {
-  if (players.user.score === numberOfRounds || players.comp.score === numberOfRounds) {
-    var winner = determineWinner(players);
-    displayWinner(winner, players);
+function playNumberOfRounds(numberOfRounds, game) {
+  if (game.players.user.score === numberOfRounds || game.players.comp.score === numberOfRounds) {
+    var winner = determineWinner(game);
+    displayWinner(winner, game);
     return false;
   }
   return true;
 }
 
-function displayWinner(winner, players) {
+function displayWinner(winner, game) {
   playGame.innerHTML = '';
   subtitle.innerText = '';
   if (winner) {
-    console.log('player wins')
-    playGame.innerHTML += `<p id="winner">${players.user.token} WINS!!!</p>`;
+    playGame.innerHTML += `<p id="winner">${game.players.user.token} WINS!!!</p>`;
   } else {
-    console.log('PC WINS')
-    playGame.innerHTML += `<p id="winner">GAME OVER <br>${players.comp.token} WINS!!!</p>`;
+    playGame.innerHTML += `<p id="winner">GAME OVER <br>${game.players.comp.token} WINS!!!</p>`;
   }
 } 
