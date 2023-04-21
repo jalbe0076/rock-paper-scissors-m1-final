@@ -4,19 +4,10 @@ var gameOptions = ['rock', 'paper', 'scissor', 'spock', 'lizard'];
 var currentGame = [];
 var game = {
   players: {},
-  gameSelected: false
+  gameSelected: false,
+  availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' }
 };
 
-var availableTokens = {
-  Professor: '🧐',
-  Devil: '😈',
-  Goblin: '👺',
-  Cat: '😼',
-  Ghost: '👻',
-  Alien: '👽',
-  Clown: '🤡',
-  Surprise: '💩'
-};
 var availableOptions = {
   rock: './assets/rock.png',
   paper: './assets/lines-paper.png',
@@ -43,7 +34,7 @@ var computerBanner = {
   token: document.querySelector('.computer-token'),
   name: document.querySelector('.computer-title'),
   score: document.querySelector('.computer-score')
-}
+};
 var computerScore = document.querySelector('computer-wins');
 var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
@@ -55,7 +46,7 @@ round3.style.backgroundColor = '#4D194D';
 // EVENT LISTENERS 
 
 window.addEventListener('load', function() {
-  getAvailableTokens(availableTokens)
+  getAvailableTokens(game);
 });
 
 playerToken.addEventListener('click', function(event) {
@@ -103,9 +94,9 @@ function getRandomNumber(numberOfOptions) {
   return Math.floor(Math.random() * numberOfOptions.length);
 }
 
-function getAvailableTokens(tokens) {
-  for (var i = 0; i < Object.keys(tokens).length; i++) {
-    playerToken.innerHTML += `<p class="token hover" id="${Object.keys(tokens)[i]}">${Object.values(availableTokens)[i]}</p>`;
+function getAvailableTokens(game) {
+  for (var i = 0; i < Object.keys(game.availableTokens).length; i++) {
+    playerToken.innerHTML += `<p class="token hover" id="${Object.keys(game.availableTokens)[i]}">${Object.values(game.availableTokens)[i]}</p>`;
   }
 }
 
