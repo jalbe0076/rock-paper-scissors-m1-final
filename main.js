@@ -5,7 +5,8 @@ var currentGame = [];
 var game = {
   players: {},
   gameSelected: false,
-  availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' }
+  availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' },
+  numberOfRounds: 3
 };
 
 var availableOptions = {
@@ -15,7 +16,6 @@ var availableOptions = {
   spock: './assets/flat-alien.png',
   lizard: './assets/flat-lizard.png'
 };
-var numberOfRounds = 3;
 
 var gameVersion = document.querySelector('.game-selection');
 var gameButton = document.querySelector('.play');
@@ -77,7 +77,7 @@ playGame.addEventListener('click', function(event) {
     var computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, availableOptions, game);
     displayGameRound(playerSelection, computerSelection, availableOptions);
-    var checkGameContinue = playNumberOfRounds(numberOfRounds, game);
+    var checkGameContinue = playNumberOfRounds(game);
     if (checkGameContinue) {
       setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
     } 
@@ -239,22 +239,22 @@ function resetScore(game) {
 
 function getNumberOfRounds(event) {
   if (event.target.id === 'round3') {
-    numberOfRounds = 3;
+    game.numberOfRounds = 3;
     round3.style.backgroundColor = '#4D194D';
     round5.style.backgroundColor = '#4D194D65';
     round7.style.backgroundColor = '#4D194D65';
   } else if (event.target.id === 'round5') {
-    numberOfRounds = 5;
+    game.numberOfRounds = 5;
     round5.style.backgroundColor = '#4D194D';
     round3.style.backgroundColor = '#4D194D65';
     round7.style.backgroundColor = '#4D194D65';
   } else if (event.target.id === 'round7') {
-    numberOfRounds = 7;
+    game.numberOfRounds = 7;
     round7.style.backgroundColor = '#4D194D';
     round3.style.backgroundColor = '#4D194D65';
     round5.style.backgroundColor = '#4D194D65';
   }
-  return numberOfRounds;
+  return game.numberOfRounds;
 }
 
 function determineWinner(game) {
@@ -265,8 +265,8 @@ function determineWinner(game) {
   return playerWinner;
 }
 
-function playNumberOfRounds(numberOfRounds, game) {
-  if (game.players.user.score === numberOfRounds || game.players.comp.score === numberOfRounds) {
+function playNumberOfRounds(game) {
+  if (game.players.user.score === game.numberOfRounds || game.players.comp.score === game.numberOfRounds) {
     var winner = determineWinner(game);
     displayWinner(winner, game);
     return false;
