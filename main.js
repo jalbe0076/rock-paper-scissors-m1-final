@@ -29,7 +29,7 @@ var subtitle = document.querySelector('.user-action')
 var playerBanner = {
   token: document.querySelector('#token'),
   name: document.querySelector('.user-name'),
-  score: document.querySelector('.player-wins'),
+  score: document.querySelector('.player-score'),
 };
 var computerBanner = {
   token: document.querySelector('.computer-token'),
@@ -40,7 +40,7 @@ var computerScore = document.querySelector('computer-wins');
 var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
-var playerScore = document.querySelector('.player-score');
+// var playerScore = document.querySelector('.player-score');
 
 gameButton.disabled = true;
 
@@ -66,15 +66,23 @@ gameVersion.addEventListener('click', function(event) {
 
 gameButton.addEventListener('click', function() {
   toggleGameView();
-  displayPlayerOptions(availableOptions)
+  displayPlayerOptions(availableOptions);
+  console.log(gameButton.innerText === 'NEW GAME')
+  if (gameButton.innerText !== 'NEW GAME') {
+    resetScore(players);
+  }
 });
 
 playGame.addEventListener('click', function(event) {
-  var playerSelection = getPlayerOption(currentGame, event);
-  var computerSelection = getRandomNumber(currentGame);
-  getGameLogic(playerSelection, computerSelection);
-  displayGameRound(playerSelection, computerSelection, currentGame);
-})
+  if (event.target.classList.contains('option')) {
+    var playerSelection = getPlayerOption(currentGame, event);
+    var computerSelection = getRandomNumber(currentGame);
+    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, availableOptions, players);
+    displayGameRound(playerSelection, computerSelection, availableOptions);
+    setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
+    
+  }
+});
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
 
@@ -91,13 +99,14 @@ function getAvailableTokens(tokens) {
 function displayPlayerOptions(options) {
   playGame.innerHTML = '';
   var numberOfCurrentOptions = Object.keys(availableOptions).length;
+  subtitle.innerText = `Select your option!`;
 
   if (currentGame.length < 5) {
     numberOfCurrentOptions -= 2;
   } 
 
   for (var i = 0; i < numberOfCurrentOptions; i++) {
-    playGame.innerHTML += `<img src="${Object.values(options)[i]}" alt="play ${Object.keys(options)[i]}" class="hover" id="${Object.keys(options)[i]}">`;
+    playGame.innerHTML += `<img src="${Object.values(options)[i]}" alt="play ${Object.keys(options)[i]}" class="hover option" id="${Object.keys(options)[i]}">`;
   }
 }
 
@@ -122,7 +131,7 @@ function populatePlayerBanners(event) {
   var player = createPlayer(event.target.innerText, event.target.id);
   playerBanner.token.innerText = `${player.user.token}`;
   playerBanner.name.innerText = `${player.user.name}`;
-  playerScore.innerText = `Score: ${player.user.score}`;
+  playerBanner.score.innerText = `Score: ${player.user.score}`;
   computerBanner.token.innerText = `${player.comp.token}`;
   computerBanner.name.innerText = `${player.comp.name}`;
   computerBanner.score.innerText = `Score: ${player.comp.score}`;
@@ -153,20 +162,19 @@ function getGameLogic(player, comp) {
   
   if (player > comp) {
     comp += logicOptions.length;
-  }
-
-  for (var i = 0; i < cutLogicOptions.length; i++) {
-    logicOptions.push(cutLogicOptions[i])
+    for (var i = 0; i < cutLogicOptions.length; i++) {
+      logicOptions.push(cutLogicOptions[i])
+    }
   }
   
   for (var i = player; i < logicOptions.length; i += 2) {
     if (player === comp) {
       return 'tie'
     } else if (i === (comp)) {
-      return 'player wins'
+      return 'player'
     }
   }
-  return 'pc wins'
+  return 'computer'
 }
 
 function enableGameBackgroundToggle(event) {
@@ -197,6 +205,29 @@ function toggleGameView() {
   } 
 }
 
-function displayGameRound(player, computer) {
-
+function displayGameRound(player, computer, options) {
+  playGame.innerHTML = '';
+  playGame.innerHTML += `<img src="${Object.values(options)[player]}" alt="play ${Object.keys(options)[player]}" class="hover" id="${Object.keys(options)[player]}">`;
+  playGame.innerHTML += `<img src="${Object.values(options)[computer]}" alt="play ${Object.keys(options)[computer]}" class="hover" id="${Object.keys(options)[computer]}">`;
 } 
+
+function getRoundWinner(winner, player, computer, options, players) {
+  if (winner === 'tie') {
+    subtitle.innerText = `This round was a tie`;
+  } else if (winner === 'player') {
+    players.user.score += 1;
+    subtitle.innerText = `${Object.keys(options)[player]} beats ${Object.keys(options)[computer]}`;
+    playerBanner.score.innerText = `Score: ${players.user.score}`;
+  } else {
+    players.comp.score += 1;
+    subtitle.innerText = `${Object.keys(options)[player]} looses against ${Object.keys(options)[computer]}`;
+    computerBanner.score.innerText = `Score: ${players.comp.score}`;
+  }
+}
+
+function resetScore(players) {
+  players.user.score = 0;
+  players.comp.score = 0;
+  playerBanner.score.innerText = `Score: ${players.user.score}`;
+  computerBanner.score.innerText = `Score: ${players.comp.score}`;
+}
