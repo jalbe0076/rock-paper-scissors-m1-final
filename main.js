@@ -6,15 +6,14 @@ var game = {
   players: {},
   gameSelected: false,
   availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' },
-  numberOfRounds: 3
-};
-
-var availableOptions = {
-  rock: './assets/rock.png',
-  paper: './assets/lines-paper.png',
-  scissor: './assets/scissors.png',
-  spock: './assets/flat-alien.png',
-  lizard: './assets/flat-lizard.png'
+  numberOfRounds: 3,
+  playableGameOptions: {
+    rock: './assets/rock.png',
+    paper: './assets/lines-paper.png',
+    scissor: './assets/scissors.png',
+    spock: './assets/flat-alien.png',
+    lizard: './assets/flat-lizard.png'
+  }
 };
 
 var gameVersion = document.querySelector('.game-selection');
@@ -65,7 +64,7 @@ gameVersion.addEventListener('click', function(event) {
 
 gameButton.addEventListener('click', function() {
   toggleGameView();
-  displayPlayerOptions(availableOptions);
+  displayPlayerOptions(game);
   if (gameButton.innerText !== 'NEW GAME') {
     resetScore(game);
   }
@@ -75,11 +74,11 @@ playGame.addEventListener('click', function(event) {
   if (event.target.classList.contains('option')) {
     var playerSelection = getPlayerOption(currentGame, event);
     var computerSelection = getRandomNumber(currentGame);
-    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, availableOptions, game);
-    displayGameRound(playerSelection, computerSelection, availableOptions);
+    getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, game);
+    displayGameRound(playerSelection, computerSelection, game);
     var checkGameContinue = playNumberOfRounds(game);
     if (checkGameContinue) {
-      setTimeout(function() { displayPlayerOptions(availableOptions) }, 1500);
+      setTimeout(function() { displayPlayerOptions(game) }, 1500);
     } 
   }
 });
@@ -100,9 +99,9 @@ function getAvailableTokens(game) {
   }
 }
 
-function displayPlayerOptions(options) {
+function displayPlayerOptions(game) {
   playGame.innerHTML = '';
-  var numberOfCurrentOptions = Object.keys(availableOptions).length;
+  var numberOfCurrentOptions = Object.keys(game.playableGameOptions).length;
   subtitle.innerText = `Select your option!`;
 
   if (currentGame.length < 5) {
@@ -110,7 +109,7 @@ function displayPlayerOptions(options) {
   } 
 
   for (var i = 0; i < numberOfCurrentOptions; i++) {
-    playGame.innerHTML += `<img src="${Object.values(options)[i]}" alt="play ${Object.keys(options)[i]}" class="hover option" id="${Object.keys(options)[i]}">`;
+    playGame.innerHTML += `<img src="${Object.values(game.playableGameOptions)[i]}" alt="play ${Object.keys(game.playableGameOptions)[i]}" class="hover option" id="${Object.keys(game.playableGameOptions)[i]}">`;
   }
 }
 
@@ -210,13 +209,16 @@ function toggleGameView() {
   } 
 }
 
-function displayGameRound(player, computer, options) {
+function displayGameRound(player, computer, game) {
+  var options = game.playableGameOptions;
   playGame.innerHTML = '';
   playGame.innerHTML += `<img src="${Object.values(options)[player]}" alt="play ${Object.keys(options)[player]}" class="hover" id="${Object.keys(options)[player]}">`;
   playGame.innerHTML += `<img src="${Object.values(options)[computer]}" alt="play ${Object.keys(options)[computer]}" class="hover" id="${Object.keys(options)[computer]}">`;
 } 
 
-function getRoundWinner(winner, player, computer, options, game) {
+function getRoundWinner(winner, player, computer, game) {
+  var options = game.playableGameOptions;
+
   if (winner === 'tie') {
     subtitle.innerText = `This round was a tie`;
   } else if (winner === 'player') {
