@@ -13,16 +13,7 @@ var gameData = {
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
   },
-  scoreHistory: [
-    {token: '🧐', wins: 0, loses: 0},
-    {token: '😈', wins: 0, loses: 0},
-    {token: '👺', wins: 0, loses: 0},
-    {token: '😼', wins: 0, loses: 0},
-    {token: '👻', wins: 0, loses: 0},
-    {token: '👽', wins: 0, loses: 0},
-    {token: '🤡', wins: 0, loses: 0},
-    {token: '💩', wins: 0, loses: 0}  
-  ]
+  scoreHistory: []
 };
 var tokens = {
   availableIcons: Object.keys(gameData.availableTokens),
@@ -60,6 +51,16 @@ round3.style.backgroundColor = '#4D194D';
 
 window.addEventListener('load', function() {
   getAvailableTokens(tokens);
+  gameData.scoreHistory = getWinHistoryFromLocalStorage() || [
+    {token: '🧐', wins: 0, loses: 0},
+    {token: '😈', wins: 0, loses: 0},
+    {token: '👺', wins: 0, loses: 0},
+    {token: '😼', wins: 0, loses: 0},
+    {token: '👻', wins: 0, loses: 0},
+    {token: '👽', wins: 0, loses: 0},
+    {token: '🤡', wins: 0, loses: 0},
+    {token: '💩', wins: 0, loses: 0}  
+  ];
 });
 
 playerToken.addEventListener('click', function(event) {
@@ -94,7 +95,8 @@ playGame.addEventListener('click', function(event) {
   }
 
   if (checkGameEnd) {
-    saveWinsToHistory(gameData);
+    var scoreHistory = saveWinsToHistory(gameData); 
+    getWinHistoryFromLocalStorage(scoreHistory);
   } else if (!checkGameEnd && playGameButton.innerText === `NEW GAME`){
     setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
   }
@@ -364,4 +366,15 @@ function saveWinsToHistory(gameData) {
   } else {
     scoreHistory[tokenIndexPosition].loses += 1;
   }
+  return scoreHistory;
 }
+
+function getWinHistoryFromLocalStorage(winHistory) {
+  if (winHistory) {
+    localStorage.setItem('scoreToStorage', JSON.stringify(winHistory));
+    return JSON.parse(localStorage.getItem('scoreToStorage'));
+  } else if (localStorage.length) {
+    return JSON.parse(localStorage.getItem('scoreToStorage'));
+  }
+}
+
