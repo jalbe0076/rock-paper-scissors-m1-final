@@ -71,6 +71,12 @@ img {
   background-color: #4D194D;
 }
 
+.player-history {
+  margin: 0.3rem 3rem 0.3rem 3rem;
+  font-size: 2rem;
+  min-width: 5rem;
+}
+
 /* PAGE LAYOUT */
 
 html {
@@ -103,6 +109,12 @@ align-items: center;
 justify-content: flex-start;
 width: 70%;
 height: 80vh;
+}
+
+.flex-start {
+  display: flex;
+
+  /* justify-content: flex-start; */
 }
 
 .game-selection {

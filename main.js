@@ -13,15 +13,15 @@ var gameData = {
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
   },
-  winHistory: [
-    {'🧐': {wins: 0, loses: 0}},
-    {'😈': {wins: 0, loses: 0}},
-    {'👺': {wins: 0, loses: 0}},
-    {'😼': {wins: 0, loses: 0}},
-    {'👻': {wins: 0, loses: 0}},
-    {'👽': {wins: 0, loses: 0}},
-    {'🤡': {wins: 0, loses: 0}},
-    {'💩': {wins: 0, loses: 0}}  
+  scoreHistory: [
+    {token: '🧐', wins: 0, loses: 0},
+    {token: '😈', wins: 0, loses: 0},
+    {token: '👺', wins: 0, loses: 0},
+    {token: '😼', wins: 0, loses: 0},
+    {token: '👻', wins: 0, loses: 0},
+    {token: '👽', wins: 0, loses: 0},
+    {token: '🤡', wins: 0, loses: 0},
+    {token: '💩', wins: 0, loses: 0}  
   ]
 };
 var tokens = {
@@ -40,7 +40,7 @@ var subtitle = document.querySelector('.user-action');
 var playerBanner = {
   token: document.querySelector('#token'),
   name: document.querySelector('.user-name'),
-  score: document.querySelector('.player-score'),
+  score: document.querySelector('.player-score')
 };
 var computerBanner = {
   token: document.querySelector('.computer-token'),
@@ -51,6 +51,7 @@ var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
 var viewHistoryButton = document.querySelector('.history');
+var clearHistory = document.querySelector('.history-clear')
 
 playGameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
@@ -70,7 +71,7 @@ playerToken.addEventListener('click', function(event) {
 
 gameVersion.addEventListener('click', function(event) {
   gameData.gameSelected = true;
-  toggleGameVersionBackgroundColour(event);
+  toggleGameVersionContainerBackgroundColour(event);
   enableButton(gameData);
   getGameVersion(event, gameData);
 });
@@ -89,21 +90,24 @@ playGame.addEventListener('click', function(event) {
     var computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, gameData);
     displayGameRound(playerSelection, computerSelection, gameData);
-    var checkGameContinue = playNumberOfRounds(gameData);
-
+    var checkGameEnd= finishNumberOfRounds(gameData);
   }
 
-  if (checkGameContinue) {
+  if (checkGameEnd) {
+    saveWinsToHistory(gameData);
+  } else if (!checkGameEnd && playGameButton.innerText === `NEW GAME`){
     setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
-  } 
+  }
 });
 
 roundsSelectedButtons.addEventListener('click', function(event) {
   getNumberOfRounds(event, gameData);
 });
 
-viewHistoryButton.addEventListener('click', function(event) {
-  toggleHistory(event);
+viewHistoryButton.addEventListener('click', function() {
+  toggleHistory();
+  removePlayerBanners();
+  populateScoreHistory(gameData);
 });
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
@@ -156,6 +160,15 @@ function populatePlayerBanners(event) {
   return player;
 }
 
+function removePlayerBanners() {
+  playerBanner.token.classList.toggle('hidden');
+  playerBanner.name.classList.toggle('hidden');
+  playerBanner.score.classList.toggle('hidden');
+  computerBanner.token.classList.toggle('hidden');
+  computerBanner.name.classList.toggle('hidden');
+  computerBanner.score.classList.toggle('hidden');
+}
+
 function getGameVersion(event, gameData) {
   var playableGameOptions = Object.keys(gameData.availableUserSelections);
   var selectGameVersion = event.target.parentNode.classList;
@@ -198,7 +211,7 @@ function getGameLogic(playerSelection, computerSelection) {
   return 'computer'
 }
 
-function toggleGameVersionBackgroundColour(event) {
+function toggleGameVersionContainerBackgroundColour(event) {
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
     standardGame.style.backgroundColor = '#4D194D';
     variationGame.style.backgroundColor = '#4D194D65';
@@ -278,7 +291,7 @@ function getNumberOfRounds(event, gameData) {
   return gameData.numberOfRounds;
 }
 
-function determineWinner(gameData) {
+function determinePlayerWinner(gameData) {
   var playerWinner = false;
   if (gameData.players.user.score > gameData.players.comp.score) {
     playerWinner = true;
@@ -286,13 +299,13 @@ function determineWinner(gameData) {
   return playerWinner;
 }
 
-function playNumberOfRounds(gameData) {
+function finishNumberOfRounds(gameData) {
   if (gameData.players.user.score === gameData.numberOfRounds || gameData.players.comp.score === gameData.numberOfRounds) {
-    var winner = determineWinner(gameData);
+    var winner = determinePlayerWinner(gameData);
     setTimeout(function() { displayWinner(winner, gameData) }, 1500);
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 function displayWinner(winner, gameData) {
@@ -305,7 +318,7 @@ function displayWinner(winner, gameData) {
   }
 } 
 
-function toggleHistory(event) {
+function toggleHistory() {
   if (playGame.classList.contains('hidden')) {
     subtitle.innerText = `Score history`;
   } else {
@@ -317,4 +330,38 @@ function toggleHistory(event) {
   gameVersion.classList.toggle('hidden');
   roundsSelectedButtons.classList.toggle('hidden');
   playGameButton.classList.toggle('hidden');
+  clearHistory.classList.toggle('hidden');
+}
+
+function populateScoreHistory(gameData) {
+  var scoreHistory = gameData.scoreHistory;
+  playGame.innerHTML = '';
+  playGame.innerHTML += `
+    <div class="flex-start">
+      <h3 class="player-history">Avatar</h3><h3 class="player-history">Wins</h3><h3 class="player-history">Loses</h3>
+    </div>`;
+  for (var i = 0; i <scoreHistory.length; i++) {
+    playGame.innerHTML += `
+      <div class="flex-start">
+        <p class="player-history">${scoreHistory[i].token}</p><p class="player-history">${scoreHistory[i].wins}</p><p class="player-history">${scoreHistory[i].loses}</p>
+      </div>`;
+  }
+}
+
+function saveWinsToHistory(gameData) {
+  var winner = determinePlayerWinner(gameData);
+  var scoreHistory = gameData.scoreHistory;
+  var tokenIndexPosition = 0;
+  for (var i = 0; i < scoreHistory.length; i++) {
+    if (scoreHistory[i].token === gameData.players.user.token) {
+      tokenIndexPosition = i;
+      break;
+    }
+  }
+
+  if (winner) {
+    scoreHistory[tokenIndexPosition].wins += 1;
+  } else {
+    scoreHistory[tokenIndexPosition].loses += 1;
+  }
 }
