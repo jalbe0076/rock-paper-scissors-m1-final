@@ -12,7 +12,8 @@ var gameData = {
     scissor: './assets/scissors.png',
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
-  }
+  },
+  scoreHistory: []
 };
 var tokens = {
   availableIcons: Object.keys(gameData.availableTokens),
@@ -21,7 +22,7 @@ var tokens = {
 
 var gameVersion = document.querySelector('.game-selection');
 var playGameButton = document.querySelector('.play');
-var roundsSelectedButtons = document.querySelector('.btn-round');
+var roundsSelectedButtons = document.querySelector('.game-number-btn');
 var round3 = document.querySelector('#round3');
 var round5 = document.querySelector('#round5');
 var round7 = document.querySelector('#round7');
@@ -30,7 +31,7 @@ var subtitle = document.querySelector('.user-action');
 var playerBanner = {
   token: document.querySelector('#token'),
   name: document.querySelector('.user-name'),
-  score: document.querySelector('.player-score'),
+  score: document.querySelector('.player-score')
 };
 var computerBanner = {
   token: document.querySelector('.computer-token'),
@@ -40,6 +41,8 @@ var computerBanner = {
 var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
+var viewHistoryButton = document.querySelector('.history');
+var clearHistory = document.querySelector('.history-clear')
 
 playGameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
@@ -48,6 +51,16 @@ round3.style.backgroundColor = '#4D194D';
 
 window.addEventListener('load', function() {
   getAvailableTokens(tokens);
+  gameData.scoreHistory = getWinHistoryFromLocalStorage() || [
+    {token: '🧐', wins: 0, loses: 0},
+    {token: '😈', wins: 0, loses: 0},
+    {token: '👺', wins: 0, loses: 0},
+    {token: '😼', wins: 0, loses: 0},
+    {token: '👻', wins: 0, loses: 0},
+    {token: '👽', wins: 0, loses: 0},
+    {token: '🤡', wins: 0, loses: 0},
+    {token: '💩', wins: 0, loses: 0}  
+  ];
 });
 
 playerToken.addEventListener('click', function(event) {
@@ -59,7 +72,7 @@ playerToken.addEventListener('click', function(event) {
 
 gameVersion.addEventListener('click', function(event) {
   gameData.gameSelected = true;
-  toggleGameVersionBackgroundColour(event);
+  toggleGameVersionContainerBackgroundColour(event);
   enableButton(gameData);
   getGameVersion(event, gameData);
 });
@@ -78,17 +91,29 @@ playGame.addEventListener('click', function(event) {
     var computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, gameData);
     displayGameRound(playerSelection, computerSelection, gameData);
-    var checkGameContinue = playNumberOfRounds(gameData);
-
+    var checkGameEnd= finishNumberOfRounds(gameData);
   }
 
-  if (checkGameContinue) {
+  if (checkGameEnd) {
+    var scoreHistory = saveWinsToHistory(gameData); 
+    getWinHistoryFromLocalStorage(scoreHistory);
+  } else if (!checkGameEnd && playGameButton.innerText === `NEW GAME`){
     setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
-  } 
+  }
 });
 
 roundsSelectedButtons.addEventListener('click', function(event) {
   getNumberOfRounds(event, gameData);
+});
+
+viewHistoryButton.addEventListener('click', function() {
+  toggleHistory();
+  removePlayerBanners();
+  populateScoreHistory(gameData);
+});
+
+clearHistory.addEventListener('click', function() {
+  clearScoreHistory(gameData);
 });
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
@@ -141,6 +166,15 @@ function populatePlayerBanners(event) {
   return player;
 }
 
+function removePlayerBanners() {
+  playerBanner.token.classList.toggle('hidden');
+  playerBanner.name.classList.toggle('hidden');
+  playerBanner.score.classList.toggle('hidden');
+  computerBanner.token.classList.toggle('hidden');
+  computerBanner.name.classList.toggle('hidden');
+  computerBanner.score.classList.toggle('hidden');
+}
+
 function getGameVersion(event, gameData) {
   var playableGameOptions = Object.keys(gameData.availableUserSelections);
   var selectGameVersion = event.target.parentNode.classList;
@@ -183,7 +217,7 @@ function getGameLogic(playerSelection, computerSelection) {
   return 'computer'
 }
 
-function toggleGameVersionBackgroundColour(event) {
+function toggleGameVersionContainerBackgroundColour(event) {
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
     standardGame.style.backgroundColor = '#4D194D';
     variationGame.style.backgroundColor = '#4D194D65';
@@ -204,6 +238,7 @@ function toggleGameView() {
   playerToken.classList.toggle('hidden');
   gameVersion.classList.toggle('hidden');
   roundsSelectedButtons.classList.toggle('hidden');
+  viewHistoryButton.classList.toggle('hidden');
 
   if (!playGame.classList.contains('hidden')) {
     playGameButton.innerText = `NEW GAME`;
@@ -262,7 +297,7 @@ function getNumberOfRounds(event, gameData) {
   return gameData.numberOfRounds;
 }
 
-function determineWinner(gameData) {
+function determinePlayerWinner(gameData) {
   var playerWinner = false;
   if (gameData.players.user.score > gameData.players.comp.score) {
     playerWinner = true;
@@ -270,13 +305,13 @@ function determineWinner(gameData) {
   return playerWinner;
 }
 
-function playNumberOfRounds(gameData) {
+function finishNumberOfRounds(gameData) {
   if (gameData.players.user.score === gameData.numberOfRounds || gameData.players.comp.score === gameData.numberOfRounds) {
-    var winner = determineWinner(gameData);
+    var winner = determinePlayerWinner(gameData);
     setTimeout(function() { displayWinner(winner, gameData) }, 1500);
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 function displayWinner(winner, gameData) {
@@ -288,3 +323,74 @@ function displayWinner(winner, gameData) {
     playGame.innerHTML += `<p id="winner">GAME OVER <br>${gameData.players.comp.token} WINS!!!</p>`;
   }
 } 
+
+function toggleHistory() {
+  if (playGame.classList.contains('hidden')) {
+    subtitle.innerText = `Score history`;
+  } else {
+    subtitle.innerText = `Select your avatar & game!`;
+  }
+
+  playGame.classList.toggle('hidden');
+  playerToken.classList.toggle('hidden');
+  gameVersion.classList.toggle('hidden');
+  roundsSelectedButtons.classList.toggle('hidden');
+  playGameButton.classList.toggle('hidden');
+  clearHistory.classList.toggle('hidden');
+}
+
+function populateScoreHistory(gameData) {
+  var scoreHistory = gameData.scoreHistory;
+  playGame.innerHTML = '';
+  playGame.innerHTML += `
+    <div class="flex-container">
+      <h3 class="player-history">Avatar</h3>
+      <h3 class="player-history">Wins</h3>
+      <h3 class="player-history">Loses</h3>
+    </div>`;
+  for (var i = 0; i <scoreHistory.length; i++) {
+    playGame.innerHTML += `
+      <div class="flex-container">
+        <p class="player-history">${scoreHistory[i].token}</p>
+        <p class="player-history">${scoreHistory[i].wins}</p>
+        <p class="player-history">${scoreHistory[i].loses}</p>
+      </div>`;
+  }
+}
+
+function saveWinsToHistory(gameData) {
+  var winner = determinePlayerWinner(gameData);
+  var scoreHistory = gameData.scoreHistory;
+  var tokenIndexPosition = 0;
+  for (var i = 0; i < scoreHistory.length; i++) {
+    if (scoreHistory[i].token === gameData.players.user.token) {
+      tokenIndexPosition = i;
+      break;
+    }
+  }
+
+  if (winner) {
+    scoreHistory[tokenIndexPosition].wins += 1;
+  } else {
+    scoreHistory[tokenIndexPosition].loses += 1;
+  }
+  return scoreHistory;
+}
+
+function getWinHistoryFromLocalStorage(scoreHistory) {
+  if (scoreHistory) {
+    localStorage.setItem('scoreToStorage', JSON.stringify(scoreHistory));
+    return JSON.parse(localStorage.getItem('scoreToStorage'));
+  } else if (localStorage.length) {
+    return JSON.parse(localStorage.getItem('scoreToStorage'));
+  }
+}
+
+function clearScoreHistory(gameData) {
+  localStorage.clear();
+  for (var i = 0; i < gameData.scoreHistory.length; i++) {
+    gameData.scoreHistory[i].wins = 0;
+    gameData.scoreHistory[i].loses = 0;
+  }
+  populateScoreHistory(gameData);
+}
