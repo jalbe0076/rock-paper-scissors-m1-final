@@ -12,7 +12,17 @@ var gameData = {
     scissor: './assets/scissors.png',
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
-  }
+  },
+  winHistory: [
+    {'🧐': {wins: 0, loses: 0}},
+    {'😈': {wins: 0, loses: 0}},
+    {'👺': {wins: 0, loses: 0}},
+    {'😼': {wins: 0, loses: 0}},
+    {'👻': {wins: 0, loses: 0}},
+    {'👽': {wins: 0, loses: 0}},
+    {'🤡': {wins: 0, loses: 0}},
+    {'💩': {wins: 0, loses: 0}}  
+  ]
 };
 var tokens = {
   availableIcons: Object.keys(gameData.availableTokens),
@@ -21,7 +31,7 @@ var tokens = {
 
 var gameVersion = document.querySelector('.game-selection');
 var playGameButton = document.querySelector('.play');
-var roundsSelectedButtons = document.querySelector('.btn-round');
+var roundsSelectedButtons = document.querySelector('.game-number-btn');
 var round3 = document.querySelector('#round3');
 var round5 = document.querySelector('#round5');
 var round7 = document.querySelector('#round7');
@@ -40,6 +50,7 @@ var computerBanner = {
 var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
+var viewHistoryButton = document.querySelector('.history');
 
 playGameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
@@ -89,6 +100,10 @@ playGame.addEventListener('click', function(event) {
 
 roundsSelectedButtons.addEventListener('click', function(event) {
   getNumberOfRounds(event, gameData);
+});
+
+viewHistoryButton.addEventListener('click', function(event) {
+  toggleHistory(event);
 });
 
 // EVENT HANDLERS AND OTHER FUNCTIONS
@@ -204,6 +219,7 @@ function toggleGameView() {
   playerToken.classList.toggle('hidden');
   gameVersion.classList.toggle('hidden');
   roundsSelectedButtons.classList.toggle('hidden');
+  viewHistoryButton.classList.toggle('hidden');
 
   if (!playGame.classList.contains('hidden')) {
     playGameButton.innerText = `NEW GAME`;
@@ -288,3 +304,17 @@ function displayWinner(winner, gameData) {
     playGame.innerHTML += `<p id="winner">GAME OVER <br>${gameData.players.comp.token} WINS!!!</p>`;
   }
 } 
+
+function toggleHistory(event) {
+  if (playGame.classList.contains('hidden')) {
+    subtitle.innerText = `Score history`;
+  } else {
+    subtitle.innerText = `Select your avatar & game!`;
+  }
+
+  playGame.classList.toggle('hidden');
+  playerToken.classList.toggle('hidden');
+  gameVersion.classList.toggle('hidden');
+  roundsSelectedButtons.classList.toggle('hidden');
+  playGameButton.classList.toggle('hidden');
+}
