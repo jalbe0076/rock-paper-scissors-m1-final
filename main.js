@@ -6,7 +6,7 @@ var gameData = {
   gameSelected: false,
   availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' },
   numberOfRounds: 3,
-  playableGameOptions: {
+  availableUserSelections: {
     rock: './assets/rock.png',
     paper: './assets/lines-paper.png',
     scissor: './assets/scissors.png',
@@ -14,10 +14,14 @@ var gameData = {
     lizard: './assets/flat-lizard.png'
   }
 };
+var tokens = {
+  availableIcons: Object.keys(gameData.availableTokens),
+  iconNames: Object.values(gameData.availableTokens)
+};
 
 var gameVersion = document.querySelector('.game-selection');
-var gameButton = document.querySelector('.play');
-var roundButtons = document.querySelector('.btn-round');
+var playGameButton = document.querySelector('.play');
+var roundsSelectedButtons = document.querySelector('.btn-round');
 var round3 = document.querySelector('#round3');
 var round5 = document.querySelector('#round5');
 var round7 = document.querySelector('#round7');
@@ -37,13 +41,13 @@ var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
 
-gameButton.disabled = true;
+playGameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
 
 // EVENT LISTENERS 
 
 window.addEventListener('load', function() {
-  getAvailableTokens(gameData);
+  getAvailableTokens(tokens);
 });
 
 playerToken.addEventListener('click', function(event) {
@@ -55,34 +59,35 @@ playerToken.addEventListener('click', function(event) {
 
 gameVersion.addEventListener('click', function(event) {
   gameData.gameSelected = true;
-  enableGameBackgroundToggle(event);
+  toggleGameVersionBackgroundColour(event);
   enableButton(gameData);
   getGameVersion(event, gameData);
 });
 
-gameButton.addEventListener('click', function() {
+playGameButton.addEventListener('click', function() {
   toggleGameView();
   displayPlayerOptions(gameData);
-  if (gameButton.innerText !== 'NEW GAME') {
+  if (playGameButton.innerText !== 'NEW GAME') {
     resetScore(gameData);
   }
 });
 
 playGame.addEventListener('click', function(event) {
   if (event.target.classList.contains('option')) {
-    var playerSelection = getPlayerOption(currentGame, event);
+    var playerSelection = getPlayerOption(event);
     var computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, gameData);
     displayGameRound(playerSelection, computerSelection, gameData);
     var checkGameContinue = playNumberOfRounds(gameData);
 
-    if (checkGameContinue) {
-      setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
-    } 
   }
+
+  if (checkGameContinue) {
+    setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
+  } 
 });
 
-roundButtons.addEventListener('click', function(event) {
+roundsSelectedButtons.addEventListener('click', function(event) {
   getNumberOfRounds(event, gameData);
 });
 
@@ -92,34 +97,29 @@ function getRandomNumber(numberOfOptions) {
   return Math.floor(Math.random() * numberOfOptions.length);
 }
 
-function getAvailableTokens(game) {
-  for (var i = 0; i < Object.keys(game.availableTokens).length; i++) {
-    playerToken.innerHTML += `<p class="token hover" id="${Object.keys(game.availableTokens)[i]}">${Object.values(game.availableTokens)[i]}</p>`;
+function getAvailableTokens(tokens) {
+  for (var i = 0; i < tokens.availableIcons.length; i++) {
+    playerToken.innerHTML += `<p class="token hover" id="${tokens.availableIcons[i]}">${tokens.iconNames[i]}</p>`;
   }
 }
 
-function displayPlayerOptions(game) {
+function displayPlayerOptions(gameData) {
   playGame.innerHTML = '';
-  var numberOfCurrentOptions = Object.keys(game.playableGameOptions).length;
+  var availableUserOptions = Object.keys(gameData.availableUserSelections);
+  var numberOfUserOptions = availableUserOptions.length;
   subtitle.innerText = `Select your option!`;
 
   if (currentGame.length < 5) {
-    numberOfCurrentOptions -= 2;
+    numberOfUserOptions -= 2;
   } 
 
-  for (var i = 0; i < numberOfCurrentOptions; i++) {
-    playGame.innerHTML += `<img src="${Object.values(game.playableGameOptions)[i]}" alt="play ${Object.keys(game.playableGameOptions)[i]}" class="hover option" id="${Object.keys(game.playableGameOptions)[i]}">`;
+  for (var i = 0; i < numberOfUserOptions; i++) {
+    playGame.innerHTML += `<img src="${Object.values(gameData.availableUserSelections)[i]}" alt="play ${availableUserOptions[i]}" class="hover option" id="${availableUserOptions[i]}">`;
   }
 }
 
-function getPlayerOption(currentGame, event) {
-  var userSelection = event.target;
-
-  for (var i = 0; i < currentGame.length; i++) {
-    if (userSelection.id === currentGame[i]) {
-      return i;
-    }
-  }
+function getPlayerOption(event) {
+  return Array.from(event.target.parentNode.children).indexOf(event.target);
 }
 
 function createPlayer(token, name) {
@@ -141,46 +141,49 @@ function populatePlayerBanners(event) {
   return player;
 }
 
-function getGameVersion(event, game) {
-  var gameOptions = Object.keys(game.playableGameOptions);
+function getGameVersion(event, gameData) {
+  var playableGameOptions = Object.keys(gameData.availableUserSelections);
+  var selectGameVersion = event.target.parentNode.classList;
   currentGame = [];
-  if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
-    currentGame = gameOptions.slice(0, 3)
-  } else if (event.target.classList.contains('alien-game') || event.target.parentNode.classList.contains('alien-game')) {
-    currentGame = gameOptions.slice(0, 5)
+
+  if (event.target.classList.contains('standard-game') || selectGameVersion.contains('standard-game')) {
+    currentGame = playableGameOptions.slice(0, 3);
+  } else if (event.target.classList.contains('alien-game') || selectGameVersion.contains('alien-game')) {
+    currentGame = playableGameOptions.slice(0, 5);
   }
   return currentGame;
 }
 
-function enableButton(game) {
-  if (Object.keys(game.players).length && game.gameSelected) {
-    gameButton.disabled = false;
-    gameButton.style.backgroundColor = '#4D194D'
+function enableButton(gameData) {
+  if (Object.keys(gameData.players).length && gameData.gameSelected) {
+    playGameButton.disabled = false;
+    playGameButton.style.backgroundColor = '#4D194D'
   }
 }
 
-function getGameLogic(player, comp) {
-  var logicOptions = currentGame.slice(0, currentGame.length);
-  var cutLogicOptions = logicOptions.slice(0, player);
+function getGameLogic(playerSelection, computerSelection) {
+  var playerOptions = currentGame.slice();
+  var logicOptions = playerOptions.slice(0, playerSelection);
   
-  if (player > comp) {
-    comp += logicOptions.length;
-    for (var i = 0; i < cutLogicOptions.length; i++) {
-      logicOptions.push(cutLogicOptions[i])
+  if (playerSelection > computerSelection) {
+    computerSelection += playerOptions.length;
+
+    for (var i = 0; i < logicOptions.length; i++) {
+      playerOptions.push(logicOptions[i])
     }
   }
   
-  for (var i = player; i < logicOptions.length; i += 2) {
-    if (player === comp) {
+  for (var i = playerSelection; i < playerOptions.length; i += 2) {
+    if (playerSelection === computerSelection) {
       return 'tie'
-    } else if (i === (comp)) {
+    } else if (i === (computerSelection)) {
       return 'player'
     }
   }
   return 'computer'
 }
 
-function enableGameBackgroundToggle(event) {
+function toggleGameVersionBackgroundColour(event) {
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
     standardGame.style.backgroundColor = '#4D194D';
     variationGame.style.backgroundColor = '#4D194D65';
@@ -200,88 +203,88 @@ function toggleGameView() {
   playGame.classList.toggle('hidden');
   playerToken.classList.toggle('hidden');
   gameVersion.classList.toggle('hidden');
-  roundButtons.classList.toggle('hidden');
+  roundsSelectedButtons.classList.toggle('hidden');
 
   if (!playGame.classList.contains('hidden')) {
-    gameButton.innerText = `NEW GAME`;
+    playGameButton.innerText = `NEW GAME`;
   } else {
-    gameButton.innerText = `PLAY!`;
+    playGameButton.innerText = `PLAY!`;
   } 
 }
 
-function displayGameRound(player, computer, game) {
-  var options = game.playableGameOptions;
+function displayGameRound(playerSelectionIndex, computerSelectionIndex, gameData) {
+  var options = gameData.availableUserSelections;
   playGame.innerHTML = '';
-  playGame.innerHTML += `<img src="${Object.values(options)[player]}" alt="play ${Object.keys(options)[player]}" class="hover" id="${Object.keys(options)[player]}">`;
-  playGame.innerHTML += `<img src="${Object.values(options)[computer]}" alt="play ${Object.keys(options)[computer]}" class="hover" id="${Object.keys(options)[computer]}">`;
+  playGame.innerHTML += `<img src="${Object.values(options)[playerSelectionIndex]}" alt="play ${Object.keys(options)[playerSelectionIndex]}" class="hover" id="${Object.keys(options)[playerSelectionIndex]}">`;
+  playGame.innerHTML += `<img src="${Object.values(options)[computerSelectionIndex]}" alt="play ${Object.keys(options)[computerSelectionIndex]}" class="hover" id="${Object.keys(options)[computerSelectionIndex]}">`;
 } 
 
-function getRoundWinner(winner, player, computer, game) {
-  var options = game.playableGameOptions;
+function getRoundWinner(winner, playerSelectionIndex, computerSelectionIndex, gameData) {
+  var options = gameData.availableUserSelections;
 
   if (winner === 'tie') {
     subtitle.innerText = `This round was a tie`;
   } else if (winner === 'player') {
-    game.players.user.score += 1;
-    subtitle.innerText = `${Object.keys(options)[player]} beats ${Object.keys(options)[computer]}`;
-    playerBanner.score.innerText = `Score: ${game.players.user.score}`;
+    gameData.players.user.score += 1;
+    subtitle.innerText = `${Object.keys(options)[playerSelectionIndex]} beats ${Object.keys(options)[computerSelectionIndex]}`;
+    playerBanner.score.innerText = `Score: ${gameData.players.user.score}`;
   } else {
-    game.players.comp.score += 1;
-    subtitle.innerText = `${Object.keys(options)[player]} looses against ${Object.keys(options)[computer]}`;
-    computerBanner.score.innerText = `Score: ${game.players.comp.score}`;
+    gameData.players.comp.score += 1;
+    subtitle.innerText = `${Object.keys(options)[playerSelectionIndex]} looses against ${Object.keys(options)[computerSelectionIndex]}`;
+    computerBanner.score.innerText = `Score: ${gameData.players.comp.score}`;
   }
 }
 
-function resetScore(game) {
-  game.players.user.score = 0;
-  game.players.comp.score = 0;
-  playerBanner.score.innerText = `Score: ${game.players.user.score}`;
-  computerBanner.score.innerText = `Score: ${game.players.comp.score}`;
+function resetScore(gameData) {
+  gameData.players.user.score = 0;
+  gameData.players.comp.score = 0;
+  playerBanner.score.innerText = `Score: ${gameData.players.user.score}`;
+  computerBanner.score.innerText = `Score: ${gameData.players.comp.score}`;
 }
 
-function getNumberOfRounds(event, game) {
+function getNumberOfRounds(event, gameData) {
   if (event.target.id === 'round3') {
-    game.numberOfRounds = 3;
+    gameData.numberOfRounds = 3;
     round3.style.backgroundColor = '#4D194D';
     round5.style.backgroundColor = '#4D194D65';
     round7.style.backgroundColor = '#4D194D65';
   } else if (event.target.id === 'round5') {
-    game.numberOfRounds = 5;
+    gameData.numberOfRounds = 5;
     round5.style.backgroundColor = '#4D194D';
     round3.style.backgroundColor = '#4D194D65';
     round7.style.backgroundColor = '#4D194D65';
   } else if (event.target.id === 'round7') {
-    game.numberOfRounds = 7;
+    gameData.numberOfRounds = 7;
     round7.style.backgroundColor = '#4D194D';
     round3.style.backgroundColor = '#4D194D65';
     round5.style.backgroundColor = '#4D194D65';
   }
-  return game.numberOfRounds;
+  return gameData.numberOfRounds;
 }
 
-function determineWinner(game) {
+function determineWinner(gameData) {
   var playerWinner = false;
-  if (game.players.user.score > game.players.comp.score) {
+  if (gameData.players.user.score > gameData.players.comp.score) {
     playerWinner = true;
   }
   return playerWinner;
 }
 
-function playNumberOfRounds(game) {
-  if (game.players.user.score === game.numberOfRounds || game.players.comp.score === game.numberOfRounds) {
-    var winner = determineWinner(game);
-    displayWinner(winner, game);
+function playNumberOfRounds(gameData) {
+  if (gameData.players.user.score === gameData.numberOfRounds || gameData.players.comp.score === gameData.numberOfRounds) {
+    var winner = determineWinner(gameData);
+    setTimeout(function() { displayWinner(winner, gameData) }, 1500);
     return false;
   }
   return true;
 }
 
-function displayWinner(winner, game) {
+function displayWinner(winner, gameData) {
   playGame.innerHTML = '';
   subtitle.innerText = '';
   if (winner) {
-    playGame.innerHTML += `<p id="winner">${game.players.user.token} WINS!!!</p>`;
+    playGame.innerHTML += `<p id="winner">${gameData.players.user.token} WINS!!!</p>`;
   } else {
-    playGame.innerHTML += `<p id="winner">GAME OVER <br>${game.players.comp.token} WINS!!!</p>`;
+    playGame.innerHTML += `<p id="winner">GAME OVER <br>${gameData.players.comp.token} WINS!!!</p>`;
   }
 } 
