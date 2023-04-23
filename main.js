@@ -112,6 +112,10 @@ viewHistoryButton.addEventListener('click', function() {
   populateScoreHistory(gameData);
 });
 
+clearHistory.addEventListener('click', function() {
+  clearScoreHistory(gameData);
+});
+
 // EVENT HANDLERS AND OTHER FUNCTIONS
 
 function getRandomNumber(numberOfOptions) {
@@ -339,13 +343,17 @@ function populateScoreHistory(gameData) {
   var scoreHistory = gameData.scoreHistory;
   playGame.innerHTML = '';
   playGame.innerHTML += `
-    <div class="flex-start">
-      <h3 class="player-history">Avatar</h3><h3 class="player-history">Wins</h3><h3 class="player-history">Loses</h3>
+    <div class="flex-container">
+      <h3 class="player-history">Avatar</h3>
+      <h3 class="player-history">Wins</h3>
+      <h3 class="player-history">Loses</h3>
     </div>`;
   for (var i = 0; i <scoreHistory.length; i++) {
     playGame.innerHTML += `
-      <div class="flex-start">
-        <p class="player-history">${scoreHistory[i].token}</p><p class="player-history">${scoreHistory[i].wins}</p><p class="player-history">${scoreHistory[i].loses}</p>
+      <div class="flex-container">
+        <p class="player-history">${scoreHistory[i].token}</p>
+        <p class="player-history">${scoreHistory[i].wins}</p>
+        <p class="player-history">${scoreHistory[i].loses}</p>
       </div>`;
   }
 }
@@ -369,12 +377,20 @@ function saveWinsToHistory(gameData) {
   return scoreHistory;
 }
 
-function getWinHistoryFromLocalStorage(winHistory) {
-  if (winHistory) {
-    localStorage.setItem('scoreToStorage', JSON.stringify(winHistory));
+function getWinHistoryFromLocalStorage(scoreHistory) {
+  if (scoreHistory) {
+    localStorage.setItem('scoreToStorage', JSON.stringify(scoreHistory));
     return JSON.parse(localStorage.getItem('scoreToStorage'));
   } else if (localStorage.length) {
     return JSON.parse(localStorage.getItem('scoreToStorage'));
   }
 }
 
+function clearScoreHistory(gameData) {
+  localStorage.clear();
+  for (var i = 0; i < gameData.scoreHistory.length; i++) {
+    gameData.scoreHistory[i].wins = 0;
+    gameData.scoreHistory[i].loses = 0;
+  }
+  populateScoreHistory(gameData);
+}
