@@ -21,7 +21,7 @@ A website allowing users to play a game of rock paper scissors. The user first s
 ### Context:
 [//]: <> (Give some context for the project here. How long did you have to work on it? How far into the Turing program are you?)
 
-We were assigned the project on 2023.04.17 and had until 2023.04.25 to complete the project. The required features were completed on 2023.04.21 and refactoring and introducing additional features and technologies were completed on 2023.04.23. This is the Turing Mod 1 final solo project issued in week 4 with the intent to implement everything that was thought since the beginning of Mod. We were tasked to build a Rock Paper Scissors game from scratch. 
+We were assigned the project on 2023.04.17 and had until 2023.04.25 to complete the project. The required features were completed on 2023.04.21 and refactoring and introducing additional features and technologies were completed on 2023.04.23. This is the Turing Mod 1 final solo project issued in week 5 with the intent to implement everything that was thought since the beginning of Mod. We were tasked to build a Rock Paper Scissors game from scratch. 
 
 ### Contributors:
 [//]: <> (Who worked on this application? Link to their GitHubs.)
