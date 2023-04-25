@@ -13,11 +13,7 @@ var gameData = {
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
   },
-  scoreHistory: []
-};
-var tokens = {
-  availableIcons: Object.keys(gameData.availableTokens),
-  iconNames: Object.values(gameData.availableTokens)
+  scoreHistory: {}
 };
 
 var gameVersion = document.querySelector('.game-selection');
@@ -42,7 +38,7 @@ var standardGame = document.querySelector('.standard-game');
 var variationGame = document.querySelector('.alien-game');
 var playGame = document.querySelector('#play');
 var viewHistoryButton = document.querySelector('.history');
-var clearHistory = document.querySelector('.history-clear')
+var clearHistory = document.querySelector('.history-clear');
 
 playGameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
@@ -50,17 +46,8 @@ round3.style.backgroundColor = '#4D194D';
 // EVENT LISTENERS 
 
 window.addEventListener('load', function() {
-  getAvailableTokens(tokens);
-  gameData.scoreHistory = getWinHistoryFromLocalStorage() || [
-    {token: '🧐', wins: 0, loses: 0},
-    {token: '😈', wins: 0, loses: 0},
-    {token: '👺', wins: 0, loses: 0},
-    {token: '😼', wins: 0, loses: 0},
-    {token: '👻', wins: 0, loses: 0},
-    {token: '👽', wins: 0, loses: 0},
-    {token: '🤡', wins: 0, loses: 0},
-    {token: '💩', wins: 0, loses: 0}  
-  ];
+  getAvailableTokens(gameData);
+  setScoreHistory(gameData);
 });
 
 playerToken.addEventListener('click', function(event) {
@@ -122,9 +109,12 @@ function getRandomNumber(numberOfOptions) {
   return Math.floor(Math.random() * numberOfOptions.length);
 }
 
-function getAvailableTokens(tokens) {
-  for (var i = 0; i < tokens.availableIcons.length; i++) {
-    playerToken.innerHTML += `<p class="token hover" id="${tokens.availableIcons[i]}">${tokens.iconNames[i]}</p>`;
+function getAvailableTokens(gameData) {
+  var availableIcons = Object.keys(gameData.availableTokens);
+  var iconNames = Object.values(gameData.availableTokens);
+
+  for (var i = 0; i < availableIcons.length; i++) {
+    playerToken.innerHTML += `<p class="token hover" id="${availableIcons[i]}">${iconNames[i]}</p>`;
   }
 }
 
@@ -147,23 +137,25 @@ function getPlayerOption(event) {
   return Array.from(event.target.parentNode.children).indexOf(event.target);
 }
 
-function createPlayer(token, name) {
+function createPlayer(tokenIndexPosition, gameData) {
+  var tokenIcon = Object.values(gameData.availableTokens)[tokenIndexPosition];
+  var userName = Object.keys(gameData.availableTokens)[tokenIndexPosition];
   return {
-    user: { token: token, name: name, score: 0 }, 
+    user: { token: tokenIcon, name: userName, score: 0 }, 
     comp: { token: '🤖', name: 'Computer', score: 0 }
   };
 }
 
 function populatePlayerBanners(event) {
-  var player = createPlayer(event.target.innerText, event.target.id);
-  playerBanner.token.innerText = `${player.user.token}`;
-  playerBanner.name.innerText = `${player.user.name}`;
-  playerBanner.score.innerText = `Score: ${player.user.score}`;
-  computerBanner.token.innerText = `${player.comp.token}`;
-  computerBanner.name.innerText = `${player.comp.name}`;
-  computerBanner.score.innerText = `Score: ${player.comp.score}`;
+  var players = createPlayer(getPlayerOption(event), gameData);
+  playerBanner.token.innerText = `${players.user.token}`;
+  playerBanner.name.innerText = `${players.user.name}`;
+  playerBanner.score.innerText = `Score: ${players.user.score}`;
+  computerBanner.token.innerText = `${players.comp.token}`;
+  computerBanner.name.innerText = `${players.comp.name}`;
+  computerBanner.score.innerText = `Score: ${players.comp.score}`;
 
-  return player;
+  return players;
 }
 
 function removePlayerBanners() {
@@ -191,7 +183,8 @@ function getGameVersion(event, gameData) {
 function enableButton(gameData) {
   if (Object.keys(gameData.players).length && gameData.gameSelected) {
     playGameButton.disabled = false;
-    playGameButton.style.backgroundColor = '#4D194D'
+    playGameButton.style.backgroundColor = '#4D194D';
+    playGameButton.classList.toggle('hover')
   }
 }
 
@@ -203,18 +196,18 @@ function getGameLogic(playerSelection, computerSelection) {
     computerSelection += playerOptions.length;
 
     for (var i = 0; i < logicOptions.length; i++) {
-      playerOptions.push(logicOptions[i])
+      playerOptions.push(logicOptions[i]);
     }
   }
   
   for (var i = playerSelection; i < playerOptions.length; i += 2) {
     if (playerSelection === computerSelection) {
-      return 'tie'
+      return 'tie';
     } else if (i === (computerSelection)) {
-      return 'player'
+      return 'player';
     }
   }
-  return 'computer'
+  return 'computer';
 }
 
 function toggleGameVersionContainerBackgroundColour(event) {
@@ -340,50 +333,43 @@ function toggleHistory() {
 }
 
 function populateScoreHistory(gameData) {
-  var scoreHistory = gameData.scoreHistory;
+  var tokenList = Object.keys(gameData.scoreHistory);
+  var tokenValues = Object.values(gameData.scoreHistory);
   playGame.innerHTML = '';
+
   playGame.innerHTML += `
     <div class="flex-container">
       <h3 class="player-history">Avatar</h3>
       <h3 class="player-history">Wins</h3>
       <h3 class="player-history">Loses</h3>
     </div>`;
-  for (var i = 0; i <scoreHistory.length; i++) {
+  for (var i = 0; i <tokenList.length; i++) {
     playGame.innerHTML += `
       <div class="flex-container">
-        <p class="player-history">${scoreHistory[i].token}</p>
-        <p class="player-history">${scoreHistory[i].wins}</p>
-        <p class="player-history">${scoreHistory[i].loses}</p>
+        <p class="player-history">${tokenList[i]}</p>
+        <p class="player-history">${tokenValues[i].wins}</p>
+        <p class="player-history">${tokenValues[i].loses}</p>
       </div>`;
   }
 }
 
 function saveWinsToHistory(gameData) {
   var winner = determinePlayerWinner(gameData);
-  var scoreHistory = gameData.scoreHistory;
-  var tokenIndexPosition = 0;
-  for (var i = 0; i < scoreHistory.length; i++) {
-    if (scoreHistory[i].token === gameData.players.user.token) {
-      tokenIndexPosition = i;
-      break;
-    }
-  }
+  var selectedPlayerToken = gameData.players.user.token;
 
   if (winner) {
-    scoreHistory[tokenIndexPosition].wins += 1;
+    gameData.scoreHistory[selectedPlayerToken].wins += 1;
   } else {
-    scoreHistory[tokenIndexPosition].loses += 1;
+    gameData.scoreHistory[selectedPlayerToken].loses += 1;
   }
-  return scoreHistory;
+  return gameData.scoreHistory;
 }
 
 function getWinHistoryFromLocalStorage(scoreHistory) {
   if (scoreHistory) {
     localStorage.setItem('scoreToStorage', JSON.stringify(scoreHistory));
-    return JSON.parse(localStorage.getItem('scoreToStorage'));
-  } else if (localStorage.length) {
-    return JSON.parse(localStorage.getItem('scoreToStorage'));
-  }
+  } 
+  return JSON.parse(localStorage.getItem('scoreToStorage'));
 }
 
 function clearScoreHistory(gameData) {
@@ -392,5 +378,19 @@ function clearScoreHistory(gameData) {
     gameData.scoreHistory[i].wins = 0;
     gameData.scoreHistory[i].loses = 0;
   }
+  setScoreHistory(gameData);
   populateScoreHistory(gameData);
+}
+
+function setScoreHistory(gameData) {
+  gameData.scoreHistory = getWinHistoryFromLocalStorage() || {
+    '🧐': {wins: 0, loses: 0},
+    '😈': {wins: 0, loses: 0},
+    '👺': {wins: 0, loses: 0},
+    '😼': {wins: 0, loses: 0},
+    '👻': {wins: 0, loses: 0},
+    '👽': {wins: 0, loses: 0},
+    '🤡': {wins: 0, loses: 0},
+    '💩': {wins: 0, loses: 0}  
+  };
 }
