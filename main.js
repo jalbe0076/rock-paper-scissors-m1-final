@@ -333,8 +333,8 @@ function toggleHistory() {
 }
 
 function populateScoreHistory(gameData) {
-  var scoreHistory = gameData.scoreHistory;
-  var tokenList = Object.keys(scoreHistory);
+  var tokenList = Object.keys(gameData.scoreHistory);
+  var tokenValues = Object.values(gameData.scoreHistory);
   playGame.innerHTML = '';
 
   playGame.innerHTML += `
@@ -347,8 +347,8 @@ function populateScoreHistory(gameData) {
     playGame.innerHTML += `
       <div class="flex-container">
         <p class="player-history">${tokenList[i]}</p>
-        <p class="player-history">${scoreHistory[[tokenList[i]].toString()].wins}</p>
-        <p class="player-history">${scoreHistory[[tokenList[i]].toString()].loses}</p>
+        <p class="player-history">${tokenValues[i].wins}</p>
+        <p class="player-history">${tokenValues[i].loses}</p>
       </div>`;
   }
 }
