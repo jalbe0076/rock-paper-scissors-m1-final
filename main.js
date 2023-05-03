@@ -43,7 +43,6 @@ const viewHistoryButton = document.querySelector('.history');
 const clearHistory = document.querySelector('.history-clear');
 
 playGameButton.disabled = true;
-round3.style.backgroundColor = '#4D194D';
 
 // EVENT LISTENERS 
 
@@ -185,7 +184,7 @@ function getGameVersion(event, gameData) {
 function enableButton(gameData) {
   if (Object.keys(gameData.players).length && gameData.gameSelected) {
     playGameButton.disabled = false;
-    playGameButton.style.backgroundColor = '#4D194D';
+    playGameButton.classList.add('btn-active')
     playGameButton.classList.toggle('hover')
   }
 }
@@ -221,11 +220,11 @@ function getGameLogic(playerSelection, computerSelection) {
 
 function toggleGameVersionContainerBackgroundColour(event) {
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
-    standardGame.style.backgroundColor = '#4D194D';
-    variationGame.style.backgroundColor = '#4D194D65';
+    standardGame.classList.add('btn-active'); 
+    variationGame.classList.remove('btn-active');
   } else if (event.target.classList.contains('alien-game') || event.target.parentNode.classList.contains('alien-game')) {
-    standardGame.style.backgroundColor = '#4D194D65';
-    variationGame.style.backgroundColor = '#4D194D';
+    standardGame.classList.remove('btn-active');
+    variationGame.classList.add('btn-active');
   }
 }
 
@@ -282,19 +281,19 @@ function resetScore(gameData) {
 function getNumberOfRounds(event, gameData) {
   if (event.target.id === 'round3') {
     gameData.numberOfRounds = 3;
-    round3.style.backgroundColor = '#4D194D';
-    round5.style.backgroundColor = '#4D194D65';
-    round7.style.backgroundColor = '#4D194D65';
+    round3.classList.add('btn-active');
+    round5.classList.remove('btn-active');
+    round7.classList.remove('btn-active');
   } else if (event.target.id === 'round5') {
     gameData.numberOfRounds = 5;
-    round5.style.backgroundColor = '#4D194D';
-    round3.style.backgroundColor = '#4D194D65';
-    round7.style.backgroundColor = '#4D194D65';
+    round5.classList.add('btn-active');
+    round3.classList.remove('btn-active');
+    round7.classList.remove('btn-active');
   } else if (event.target.id === 'round7') {
     gameData.numberOfRounds = 7;
-    round7.style.backgroundColor = '#4D194D';
-    round3.style.backgroundColor = '#4D194D65';
-    round5.style.backgroundColor = '#4D194D65';
+    round7.classList.add('btn-active');
+    round3.classList.remove('btn-active');
+    round5.classList.remove('btn-active');
   }
   return gameData.numberOfRounds;
 }
