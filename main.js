@@ -353,14 +353,15 @@ function populateScoreHistory(gameData) {
       <h3 class="player-history">Wins</h3>
       <h3 class="player-history">Loses</h3>
     </div>`;
-  for (var i = 0; i <tokenList.length; i++) {
+  tokenList.forEach(token => {
+    let tokenIndex = tokenList.indexOf(token);
     playGame.innerHTML += `
       <div class="flex-container">
-        <p class="player-history">${tokenList[i]}</p>
-        <p class="player-history">${playerWinsList[i]}</p>
-        <p class="player-history">${playerLosesList[i]}</p>
+        <p class="player-history">${token}</p>
+        <p class="player-history">${playerWinsList[tokenIndex]}</p>
+        <p class="player-history">${playerLosesList[tokenIndex]}</p>
       </div>`;
-  }
+  });
 }
 
 function saveWinsToHistory(gameData) {
