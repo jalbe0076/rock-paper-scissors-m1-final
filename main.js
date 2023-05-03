@@ -1,7 +1,7 @@
 // VARIABLES & DATA MODEL
 
-var currentGame = [];
-var gameData = {
+let currentGame = [];
+let gameData = {
   players: {},
   gameSelected: false,
   availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' },
@@ -13,35 +13,34 @@ var gameData = {
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
   },
-  scoreHistory: {}
+  scoreHistory: []
 };
 
-var gameVersion = document.querySelector('.game-selection');
-var playGameButton = document.querySelector('.play');
-var roundsSelectedButtons = document.querySelector('.game-number-btn');
-var round3 = document.querySelector('#round3');
-var round5 = document.querySelector('#round5');
-var round7 = document.querySelector('#round7');
-var playerToken = document.querySelector('.player-token');
-var subtitle = document.querySelector('.user-action');
-var playerBanner = {
+const gameVersion = document.querySelector('.game-selection');
+const playGameButton = document.querySelector('.play');
+const roundsSelectedButtons = document.querySelector('.game-number-btn');
+const round3 = document.querySelector('#round3');
+const round5 = document.querySelector('#round5');
+const round7 = document.querySelector('#round7');
+const playerToken = document.querySelector('.player-token');
+const subtitle = document.querySelector('.user-action');
+const playerBanner = {
   token: document.querySelector('#token'),
   name: document.querySelector('.user-name'),
   score: document.querySelector('.player-score')
 };
-var computerBanner = {
+const computerBanner = {
   token: document.querySelector('.computer-token'),
   name: document.querySelector('.computer-title'),
   score: document.querySelector('.computer-score')
 };
-var standardGame = document.querySelector('.standard-game');
-var variationGame = document.querySelector('.alien-game');
-var playGame = document.querySelector('#play');
-var viewHistoryButton = document.querySelector('.history');
-var clearHistory = document.querySelector('.history-clear');
+const standardGame = document.querySelector('.standard-game');
+const variationGame = document.querySelector('.alien-game');
+const playGame = document.querySelector('#play');
+const viewHistoryButton = document.querySelector('.history');
+const clearHistory = document.querySelector('.history-clear');
 
 playGameButton.disabled = true;
-round3.style.backgroundColor = '#4D194D';
 
 // EVENT LISTENERS 
 
@@ -69,20 +68,23 @@ playGameButton.addEventListener('click', function() {
   displayPlayerOptions(gameData);
   if (playGameButton.innerText !== 'NEW GAME') {
     resetScore(gameData);
+    subtitle.innerText = `Select your avatar & game!`;
   }
 });
 
 playGame.addEventListener('click', function(event) {
+  let checkGameEnd;
+
   if (event.target.classList.contains('option')) {
-    var playerSelection = getPlayerOption(event);
-    var computerSelection = getRandomNumber(currentGame);
+    const playerSelection = getPlayerOption(event);
+    const computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, gameData);
     displayGameRound(playerSelection, computerSelection, gameData);
-    var checkGameEnd= finishNumberOfRounds(gameData);
+    checkGameEnd= finishNumberOfRounds(gameData);
   }
 
   if (checkGameEnd) {
-    var scoreHistory = saveWinsToHistory(gameData); 
+    const scoreHistory = saveWinsToHistory(gameData); 
     getWinHistoryFromLocalStorage(scoreHistory);
   } else if (!checkGameEnd && playGameButton.innerText === `NEW GAME`){
     setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
@@ -110,27 +112,28 @@ function getRandomNumber(numberOfOptions) {
 }
 
 function getAvailableTokens(gameData) {
-  var availableIcons = Object.keys(gameData.availableTokens);
-  var iconNames = Object.values(gameData.availableTokens);
+  const availableIcons = Object.keys(gameData.availableTokens);
+  const iconNames = Object.values(gameData.availableTokens);
 
-  for (var i = 0; i < availableIcons.length; i++) {
-    playerToken.innerHTML += `<p class="token hover" id="${availableIcons[i]}">${iconNames[i]}</p>`;
-  }
+  availableIcons.forEach(tokenName => {
+    playerToken.innerHTML += `<p class="token hover" id="${tokenName}">${iconNames[availableIcons.indexOf(tokenName)]}</p>`;
+  })
 }
 
 function displayPlayerOptions(gameData) {
   playGame.innerHTML = '';
-  var availableUserOptions = Object.keys(gameData.availableUserSelections);
-  var numberOfUserOptions = availableUserOptions.length;
+  let availableUserOptions = Object.keys(gameData.availableUserSelections);
+  let availableOptionPics = Object.values(gameData.availableUserSelections);
   subtitle.innerText = `Select your option!`;
 
   if (currentGame.length < 5) {
-    numberOfUserOptions -= 2;
+    availableUserOptions = availableUserOptions.slice(0, 3);
+    availableOptionPics = availableOptionPics.slice(0, 3);
   } 
 
-  for (var i = 0; i < numberOfUserOptions; i++) {
-    playGame.innerHTML += `<img src="${Object.values(gameData.availableUserSelections)[i]}" alt="play ${availableUserOptions[i]}" class="hover option" id="${availableUserOptions[i]}">`;
-  }
+  availableUserOptions.forEach(fighter => {
+    playGame.innerHTML += `<img src="${availableOptionPics[availableUserOptions.indexOf(fighter)]}" alt="play ${fighter}" class="hover option" id="${fighter}">`;
+  });
 }
 
 function getPlayerOption(event) {
@@ -138,8 +141,8 @@ function getPlayerOption(event) {
 }
 
 function createPlayer(tokenIndexPosition, gameData) {
-  var tokenIcon = Object.values(gameData.availableTokens)[tokenIndexPosition];
-  var userName = Object.keys(gameData.availableTokens)[tokenIndexPosition];
+  const tokenIcon = Object.values(gameData.availableTokens)[tokenIndexPosition];
+  const userName = Object.keys(gameData.availableTokens)[tokenIndexPosition];
   return {
     user: { token: tokenIcon, name: userName, score: 0 }, 
     comp: { token: '🤖', name: 'Computer', score: 0 }
@@ -147,7 +150,7 @@ function createPlayer(tokenIndexPosition, gameData) {
 }
 
 function populatePlayerBanners(event) {
-  var players = createPlayer(getPlayerOption(event), gameData);
+  const players = createPlayer(getPlayerOption(event), gameData);
   playerBanner.token.innerText = `${players.user.token}`;
   playerBanner.name.innerText = `${players.user.name}`;
   playerBanner.score.innerText = `Score: ${players.user.score}`;
@@ -168,8 +171,8 @@ function removePlayerBanners() {
 }
 
 function getGameVersion(event, gameData) {
-  var playableGameOptions = Object.keys(gameData.availableUserSelections);
-  var selectGameVersion = event.target.parentNode.classList;
+  const playableGameOptions = Object.keys(gameData.availableUserSelections);
+  const selectGameVersion = event.target.parentNode.classList;
   currentGame = [];
 
   if (event.target.classList.contains('standard-game') || selectGameVersion.contains('standard-game')) {
@@ -183,27 +186,34 @@ function getGameVersion(event, gameData) {
 function enableButton(gameData) {
   if (Object.keys(gameData.players).length && gameData.gameSelected) {
     playGameButton.disabled = false;
-    playGameButton.style.backgroundColor = '#4D194D';
+    playGameButton.classList.add('btn-active')
     playGameButton.classList.toggle('hover')
   }
 }
 
+function modifyFighterOptions(playerSelection, computerSelection) {
+  const playerOptions = currentGame.slice();
+  playerOptions
+    .slice(0, playerSelection)
+    .forEach(fighter => playerOptions.push(fighter));
+  
+  return playerOptions;
+}
+
 function getGameLogic(playerSelection, computerSelection) {
-  var playerOptions = currentGame.slice();
-  var logicOptions = playerOptions.slice(0, playerSelection);
+  let playerOptions = currentGame.slice();
+  
+  if (playerSelection === computerSelection) {
+    return 'tie';
+  } 
   
   if (playerSelection > computerSelection) {
     computerSelection += playerOptions.length;
-
-    for (var i = 0; i < logicOptions.length; i++) {
-      playerOptions.push(logicOptions[i]);
-    }
+    playerOptions = modifyFighterOptions(playerSelection, computerSelection);
   }
-  
-  for (var i = playerSelection; i < playerOptions.length; i += 2) {
-    if (playerSelection === computerSelection) {
-      return 'tie';
-    } else if (i === (computerSelection)) {
+
+  for (let i = playerSelection; i < playerOptions.length; i += 2) {
+    if (i === (computerSelection)) {
       return 'player';
     }
   }
@@ -212,11 +222,11 @@ function getGameLogic(playerSelection, computerSelection) {
 
 function toggleGameVersionContainerBackgroundColour(event) {
   if (event.target.classList.contains('standard-game') || event.target.parentNode.classList.contains('standard-game')) {
-    standardGame.style.backgroundColor = '#4D194D';
-    variationGame.style.backgroundColor = '#4D194D65';
+    standardGame.classList.add('btn-active'); 
+    variationGame.classList.remove('btn-active');
   } else if (event.target.classList.contains('alien-game') || event.target.parentNode.classList.contains('alien-game')) {
-    standardGame.style.backgroundColor = '#4D194D65';
-    variationGame.style.backgroundColor = '#4D194D';
+    standardGame.classList.remove('btn-active');
+    variationGame.classList.add('btn-active');
   }
 }
 
@@ -241,14 +251,14 @@ function toggleGameView() {
 }
 
 function displayGameRound(playerSelectionIndex, computerSelectionIndex, gameData) {
-  var options = gameData.availableUserSelections;
+  const options = gameData.availableUserSelections;
   playGame.innerHTML = '';
   playGame.innerHTML += `<img src="${Object.values(options)[playerSelectionIndex]}" alt="play ${Object.keys(options)[playerSelectionIndex]}" class="hover" id="${Object.keys(options)[playerSelectionIndex]}">`;
   playGame.innerHTML += `<img src="${Object.values(options)[computerSelectionIndex]}" alt="play ${Object.keys(options)[computerSelectionIndex]}" class="hover" id="${Object.keys(options)[computerSelectionIndex]}">`;
 } 
 
 function getRoundWinner(winner, playerSelectionIndex, computerSelectionIndex, gameData) {
-  var options = gameData.availableUserSelections;
+  const options = gameData.availableUserSelections;
 
   if (winner === 'tie') {
     subtitle.innerText = `This round was a tie`;
@@ -273,25 +283,25 @@ function resetScore(gameData) {
 function getNumberOfRounds(event, gameData) {
   if (event.target.id === 'round3') {
     gameData.numberOfRounds = 3;
-    round3.style.backgroundColor = '#4D194D';
-    round5.style.backgroundColor = '#4D194D65';
-    round7.style.backgroundColor = '#4D194D65';
+    round3.classList.add('btn-active');
+    round5.classList.remove('btn-active');
+    round7.classList.remove('btn-active');
   } else if (event.target.id === 'round5') {
     gameData.numberOfRounds = 5;
-    round5.style.backgroundColor = '#4D194D';
-    round3.style.backgroundColor = '#4D194D65';
-    round7.style.backgroundColor = '#4D194D65';
+    round5.classList.add('btn-active');
+    round3.classList.remove('btn-active');
+    round7.classList.remove('btn-active');
   } else if (event.target.id === 'round7') {
     gameData.numberOfRounds = 7;
-    round7.style.backgroundColor = '#4D194D';
-    round3.style.backgroundColor = '#4D194D65';
-    round5.style.backgroundColor = '#4D194D65';
+    round7.classList.add('btn-active');
+    round3.classList.remove('btn-active');
+    round5.classList.remove('btn-active');
   }
   return gameData.numberOfRounds;
 }
 
 function determinePlayerWinner(gameData) {
-  var playerWinner = false;
+  let playerWinner = false;
   if (gameData.players.user.score > gameData.players.comp.score) {
     playerWinner = true;
   }
@@ -300,7 +310,7 @@ function determinePlayerWinner(gameData) {
 
 function finishNumberOfRounds(gameData) {
   if (gameData.players.user.score === gameData.numberOfRounds || gameData.players.comp.score === gameData.numberOfRounds) {
-    var winner = determinePlayerWinner(gameData);
+    const winner = determinePlayerWinner(gameData);
     setTimeout(function() { displayWinner(winner, gameData) }, 1500);
     return true;
   }
@@ -333,8 +343,9 @@ function toggleHistory() {
 }
 
 function populateScoreHistory(gameData) {
-  var tokenList = Object.keys(gameData.scoreHistory);
-  var tokenValues = Object.values(gameData.scoreHistory);
+  const tokenList = gameData.scoreHistory.map(availablePlayers => availablePlayers.token);
+  const playerWinsList = gameData.scoreHistory.map(availablePlayers => availablePlayers.wins);
+  const playerLosesList = gameData.scoreHistory.map(availablePlayers => availablePlayers.loses);
   playGame.innerHTML = '';
 
   playGame.innerHTML += `
@@ -343,24 +354,28 @@ function populateScoreHistory(gameData) {
       <h3 class="player-history">Wins</h3>
       <h3 class="player-history">Loses</h3>
     </div>`;
-  for (var i = 0; i <tokenList.length; i++) {
+  tokenList.forEach(token => {
+    let tokenIndex = tokenList.indexOf(token);
     playGame.innerHTML += `
       <div class="flex-container">
-        <p class="player-history">${tokenList[i]}</p>
-        <p class="player-history">${tokenValues[i].wins}</p>
-        <p class="player-history">${tokenValues[i].loses}</p>
+        <p class="player-history">${token}</p>
+        <p class="player-history">${playerWinsList[tokenIndex]}</p>
+        <p class="player-history">${playerLosesList[tokenIndex]}</p>
       </div>`;
-  }
+  });
 }
 
 function saveWinsToHistory(gameData) {
-  var winner = determinePlayerWinner(gameData);
-  var selectedPlayerToken = gameData.players.user.token;
+  const winner = determinePlayerWinner(gameData);
+  const selectedPlayerToken = gameData.players.user.token;
+  const currentTokenIndexPosition = gameData.scoreHistory
+    .map(availablePlayers => availablePlayers.token)
+    .indexOf(selectedPlayerToken);
 
   if (winner) {
-    gameData.scoreHistory[selectedPlayerToken].wins += 1;
+    gameData.scoreHistory[currentTokenIndexPosition].wins += 1;
   } else {
-    gameData.scoreHistory[selectedPlayerToken].loses += 1;
+    gameData.scoreHistory[currentTokenIndexPosition].loses += 1;
   }
   return gameData.scoreHistory;
 }
@@ -374,23 +389,24 @@ function getWinHistoryFromLocalStorage(scoreHistory) {
 
 function clearScoreHistory(gameData) {
   localStorage.clear();
-  for (var i = 0; i < gameData.scoreHistory.length; i++) {
-    gameData.scoreHistory[i].wins = 0;
-    gameData.scoreHistory[i].loses = 0;
-  }
+  gameData.scoreHistory.forEach(score => {
+    score.wins = 0;
+    score.loses = 0;
+  });
+
   setScoreHistory(gameData);
   populateScoreHistory(gameData);
 }
 
 function setScoreHistory(gameData) {
-  gameData.scoreHistory = getWinHistoryFromLocalStorage() || {
-    '🧐': {wins: 0, loses: 0},
-    '😈': {wins: 0, loses: 0},
-    '👺': {wins: 0, loses: 0},
-    '😼': {wins: 0, loses: 0},
-    '👻': {wins: 0, loses: 0},
-    '👽': {wins: 0, loses: 0},
-    '🤡': {wins: 0, loses: 0},
-    '💩': {wins: 0, loses: 0}  
-  };
+  gameData.scoreHistory = getWinHistoryFromLocalStorage() || [
+    {token: '🧐', wins: 0, loses: 0},
+    {token: '😈', wins: 0, loses: 0},
+    {token: '👺', wins: 0, loses: 0},
+    {token: '😼', wins: 0, loses: 0},
+    {token: '👻', wins: 0, loses: 0},
+    {token: '👽', wins: 0, loses: 0},
+    {token: '🤡', wins: 0, loses: 0},
+    {token: '💩', wins: 0, loses: 0}  
+  ];
 }
