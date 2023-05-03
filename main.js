@@ -72,16 +72,18 @@ playGameButton.addEventListener('click', function() {
 });
 
 playGame.addEventListener('click', function(event) {
+  let checkGameEnd;
+
   if (event.target.classList.contains('option')) {
-    var playerSelection = getPlayerOption(event);
-    var computerSelection = getRandomNumber(currentGame);
+    const playerSelection = getPlayerOption(event);
+    const computerSelection = getRandomNumber(currentGame);
     getRoundWinner(getGameLogic(playerSelection, computerSelection), playerSelection, computerSelection, gameData);
     displayGameRound(playerSelection, computerSelection, gameData);
-    var checkGameEnd= finishNumberOfRounds(gameData);
+    checkGameEnd= finishNumberOfRounds(gameData);
   }
 
   if (checkGameEnd) {
-    var scoreHistory = saveWinsToHistory(gameData); 
+    const scoreHistory = saveWinsToHistory(gameData); 
     getWinHistoryFromLocalStorage(scoreHistory);
   } else if (!checkGameEnd && playGameButton.innerText === `NEW GAME`){
     setTimeout(function() { displayPlayerOptions(gameData) }, 1500);
@@ -109,28 +111,28 @@ function getRandomNumber(numberOfOptions) {
 }
 
 function getAvailableTokens(gameData) {
-  var availableIcons = Object.keys(gameData.availableTokens);
-  var iconNames = Object.values(gameData.availableTokens);
+  const availableIcons = Object.keys(gameData.availableTokens);
+  const iconNames = Object.values(gameData.availableTokens);
 
   availableIcons.forEach(tokenName => {
-    console.log(iconNames.indexOf(tokenName))
     playerToken.innerHTML += `<p class="token hover" id="${tokenName}">${iconNames[availableIcons.indexOf(tokenName)]}</p>`;
   })
 }
 
 function displayPlayerOptions(gameData) {
   playGame.innerHTML = '';
-  var availableUserOptions = Object.keys(gameData.availableUserSelections);
-  var numberOfUserOptions = availableUserOptions.length;
+  let availableUserOptions = Object.keys(gameData.availableUserSelections);
+  let availableOptionPics = Object.values(gameData.availableUserSelections);
   subtitle.innerText = `Select your option!`;
 
   if (currentGame.length < 5) {
-    numberOfUserOptions -= 2;
+    availableUserOptions = availableUserOptions.slice(0, 3);
+    availableOptionPics = availableOptionPics.slice(0, 3);
   } 
 
-  for (var i = 0; i < numberOfUserOptions; i++) {
-    playGame.innerHTML += `<img src="${Object.values(gameData.availableUserSelections)[i]}" alt="play ${availableUserOptions[i]}" class="hover option" id="${availableUserOptions[i]}">`;
-  }
+  availableUserOptions.forEach(fighter => {
+    playGame.innerHTML += `<img src="${availableOptionPics[availableUserOptions.indexOf(fighter)]}" alt="play ${fighter}" class="hover option" id="${fighter}">`;
+  });
 }
 
 function getPlayerOption(event) {
@@ -138,8 +140,8 @@ function getPlayerOption(event) {
 }
 
 function createPlayer(tokenIndexPosition, gameData) {
-  var tokenIcon = Object.values(gameData.availableTokens)[tokenIndexPosition];
-  var userName = Object.keys(gameData.availableTokens)[tokenIndexPosition];
+  const tokenIcon = Object.values(gameData.availableTokens)[tokenIndexPosition];
+  const userName = Object.keys(gameData.availableTokens)[tokenIndexPosition];
   return {
     user: { token: tokenIcon, name: userName, score: 0 }, 
     comp: { token: '🤖', name: 'Computer', score: 0 }
@@ -147,7 +149,7 @@ function createPlayer(tokenIndexPosition, gameData) {
 }
 
 function populatePlayerBanners(event) {
-  var players = createPlayer(getPlayerOption(event), gameData);
+  const players = createPlayer(getPlayerOption(event), gameData);
   playerBanner.token.innerText = `${players.user.token}`;
   playerBanner.name.innerText = `${players.user.name}`;
   playerBanner.score.innerText = `Score: ${players.user.score}`;
@@ -168,8 +170,8 @@ function removePlayerBanners() {
 }
 
 function getGameVersion(event, gameData) {
-  var playableGameOptions = Object.keys(gameData.availableUserSelections);
-  var selectGameVersion = event.target.parentNode.classList;
+  const playableGameOptions = Object.keys(gameData.availableUserSelections);
+  const selectGameVersion = event.target.parentNode.classList;
   currentGame = [];
 
   if (event.target.classList.contains('standard-game') || selectGameVersion.contains('standard-game')) {
@@ -248,14 +250,14 @@ function toggleGameView() {
 }
 
 function displayGameRound(playerSelectionIndex, computerSelectionIndex, gameData) {
-  var options = gameData.availableUserSelections;
+  const options = gameData.availableUserSelections;
   playGame.innerHTML = '';
   playGame.innerHTML += `<img src="${Object.values(options)[playerSelectionIndex]}" alt="play ${Object.keys(options)[playerSelectionIndex]}" class="hover" id="${Object.keys(options)[playerSelectionIndex]}">`;
   playGame.innerHTML += `<img src="${Object.values(options)[computerSelectionIndex]}" alt="play ${Object.keys(options)[computerSelectionIndex]}" class="hover" id="${Object.keys(options)[computerSelectionIndex]}">`;
 } 
 
 function getRoundWinner(winner, playerSelectionIndex, computerSelectionIndex, gameData) {
-  var options = gameData.availableUserSelections;
+  const options = gameData.availableUserSelections;
 
   if (winner === 'tie') {
     subtitle.innerText = `This round was a tie`;
@@ -298,7 +300,7 @@ function getNumberOfRounds(event, gameData) {
 }
 
 function determinePlayerWinner(gameData) {
-  var playerWinner = false;
+  let playerWinner = false;
   if (gameData.players.user.score > gameData.players.comp.score) {
     playerWinner = true;
   }
@@ -307,7 +309,7 @@ function determinePlayerWinner(gameData) {
 
 function finishNumberOfRounds(gameData) {
   if (gameData.players.user.score === gameData.numberOfRounds || gameData.players.comp.score === gameData.numberOfRounds) {
-    var winner = determinePlayerWinner(gameData);
+    const winner = determinePlayerWinner(gameData);
     setTimeout(function() { displayWinner(winner, gameData) }, 1500);
     return true;
   }
