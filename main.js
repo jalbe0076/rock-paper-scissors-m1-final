@@ -16,8 +16,6 @@ let gameData = {
   scoreHistory: []
 };
 
-var test = {name: 'fs', list: ['fs','fsd']}
-
 const gameVersion = document.querySelector('.game-selection');
 const playGameButton = document.querySelector('.play');
 const roundsSelectedButtons = document.querySelector('.game-number-btn');
@@ -114,9 +112,10 @@ function getAvailableTokens(gameData) {
   var availableIcons = Object.keys(gameData.availableTokens);
   var iconNames = Object.values(gameData.availableTokens);
 
-  for (var i = 0; i < availableIcons.length; i++) {
-    playerToken.innerHTML += `<p class="token hover" id="${availableIcons[i]}">${iconNames[i]}</p>`;
-  }
+  availableIcons.forEach(tokenName => {
+    console.log(iconNames.indexOf(tokenName))
+    playerToken.innerHTML += `<p class="token hover" id="${tokenName}">${iconNames[availableIcons.indexOf(tokenName)]}</p>`;
+  })
 }
 
 function displayPlayerOptions(gameData) {
