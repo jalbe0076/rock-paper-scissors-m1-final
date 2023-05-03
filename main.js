@@ -190,22 +190,29 @@ function enableButton(gameData) {
   }
 }
 
+function modifyFighterOptions(playerSelection, computerSelection) {
+  const playerOptions = currentGame.slice();
+  playerOptions
+    .slice(0, playerSelection)
+    .forEach(fighter => playerOptions.push(fighter));
+  
+  return playerOptions;
+}
+
 function getGameLogic(playerSelection, computerSelection) {
-  var playerOptions = currentGame.slice();
-  var logicOptions = playerOptions.slice(0, playerSelection);
+  let playerOptions = currentGame.slice();
+  
+  if (playerSelection === computerSelection) {
+    return 'tie';
+  } 
   
   if (playerSelection > computerSelection) {
     computerSelection += playerOptions.length;
-
-    for (var i = 0; i < logicOptions.length; i++) {
-      playerOptions.push(logicOptions[i]);
-    }
+    playerOptions = modifyFighterOptions(playerSelection, computerSelection);
   }
-  
-  for (var i = playerSelection; i < playerOptions.length; i += 2) {
-    if (playerSelection === computerSelection) {
-      return 'tie';
-    } else if (i === (computerSelection)) {
+
+  for (let i = playerSelection; i < playerOptions.length; i += 2) {
+    if (i === (computerSelection)) {
       return 'player';
     }
   }
