@@ -1,7 +1,7 @@
 // VARIABLES & DATA MODEL
 
-var currentGame = [];
-var gameData = {
+let currentGame = [];
+let gameData = {
   players: {},
   gameSelected: false,
   availableTokens: { Professor: '🧐', Devil: '😈', Goblin: '👺', Cat: '😼', Ghost: '👻', Alien: '👽', Clown: '🤡', Surprise: '💩' },
@@ -13,32 +13,34 @@ var gameData = {
     spock: './assets/flat-alien.png',
     lizard: './assets/flat-lizard.png'
   },
-  scoreHistory: {}
+  scoreHistory: []
 };
 
-var gameVersion = document.querySelector('.game-selection');
-var playGameButton = document.querySelector('.play');
-var roundsSelectedButtons = document.querySelector('.game-number-btn');
-var round3 = document.querySelector('#round3');
-var round5 = document.querySelector('#round5');
-var round7 = document.querySelector('#round7');
-var playerToken = document.querySelector('.player-token');
-var subtitle = document.querySelector('.user-action');
-var playerBanner = {
+var test = {name: 'fs', list: ['fs','fsd']}
+
+const gameVersion = document.querySelector('.game-selection');
+const playGameButton = document.querySelector('.play');
+const roundsSelectedButtons = document.querySelector('.game-number-btn');
+const round3 = document.querySelector('#round3');
+const round5 = document.querySelector('#round5');
+const round7 = document.querySelector('#round7');
+const playerToken = document.querySelector('.player-token');
+const subtitle = document.querySelector('.user-action');
+const playerBanner = {
   token: document.querySelector('#token'),
   name: document.querySelector('.user-name'),
   score: document.querySelector('.player-score')
 };
-var computerBanner = {
+const computerBanner = {
   token: document.querySelector('.computer-token'),
   name: document.querySelector('.computer-title'),
   score: document.querySelector('.computer-score')
 };
-var standardGame = document.querySelector('.standard-game');
-var variationGame = document.querySelector('.alien-game');
-var playGame = document.querySelector('#play');
-var viewHistoryButton = document.querySelector('.history');
-var clearHistory = document.querySelector('.history-clear');
+const standardGame = document.querySelector('.standard-game');
+const variationGame = document.querySelector('.alien-game');
+const playGame = document.querySelector('#play');
+const viewHistoryButton = document.querySelector('.history');
+const clearHistory = document.querySelector('.history-clear');
 
 playGameButton.disabled = true;
 round3.style.backgroundColor = '#4D194D';
@@ -333,8 +335,9 @@ function toggleHistory() {
 }
 
 function populateScoreHistory(gameData) {
-  var tokenList = Object.keys(gameData.scoreHistory);
-  var tokenValues = Object.values(gameData.scoreHistory);
+  const tokenList = gameData.scoreHistory.map(availablePlayers => availablePlayers.token);
+  const playerWinsList = gameData.scoreHistory.map(availablePlayers => availablePlayers.wins);
+  const playerLosesList = gameData.scoreHistory.map(availablePlayers => availablePlayers.loses);
   playGame.innerHTML = '';
 
   playGame.innerHTML += `
@@ -347,20 +350,23 @@ function populateScoreHistory(gameData) {
     playGame.innerHTML += `
       <div class="flex-container">
         <p class="player-history">${tokenList[i]}</p>
-        <p class="player-history">${tokenValues[i].wins}</p>
-        <p class="player-history">${tokenValues[i].loses}</p>
+        <p class="player-history">${playerWinsList[i]}</p>
+        <p class="player-history">${playerLosesList[i]}</p>
       </div>`;
   }
 }
 
 function saveWinsToHistory(gameData) {
-  var winner = determinePlayerWinner(gameData);
-  var selectedPlayerToken = gameData.players.user.token;
+  const winner = determinePlayerWinner(gameData);
+  const selectedPlayerToken = gameData.players.user.token;
+  const currentTokenIndexPosition = gameData.scoreHistory
+    .map(availablePlayers => availablePlayers.token)
+    .indexOf(selectedPlayerToken);
 
   if (winner) {
-    gameData.scoreHistory[selectedPlayerToken].wins += 1;
+    gameData.scoreHistory[currentTokenIndexPosition].wins += 1;
   } else {
-    gameData.scoreHistory[selectedPlayerToken].loses += 1;
+    gameData.scoreHistory[currentTokenIndexPosition].loses += 1;
   }
   return gameData.scoreHistory;
 }
@@ -383,14 +389,14 @@ function clearScoreHistory(gameData) {
 }
 
 function setScoreHistory(gameData) {
-  gameData.scoreHistory = getWinHistoryFromLocalStorage() || {
-    '🧐': {wins: 0, loses: 0},
-    '😈': {wins: 0, loses: 0},
-    '👺': {wins: 0, loses: 0},
-    '😼': {wins: 0, loses: 0},
-    '👻': {wins: 0, loses: 0},
-    '👽': {wins: 0, loses: 0},
-    '🤡': {wins: 0, loses: 0},
-    '💩': {wins: 0, loses: 0}  
-  };
+  gameData.scoreHistory = getWinHistoryFromLocalStorage() || [
+    {token: '🧐', wins: 0, loses: 0},
+    {token: '😈', wins: 0, loses: 0},
+    {token: '👺', wins: 0, loses: 0},
+    {token: '😼', wins: 0, loses: 0},
+    {token: '👻', wins: 0, loses: 0},
+    {token: '👽', wins: 0, loses: 0},
+    {token: '🤡', wins: 0, loses: 0},
+    {token: '💩', wins: 0, loses: 0}  
+  ];
 }
