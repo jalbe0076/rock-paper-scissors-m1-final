@@ -68,6 +68,7 @@ playGameButton.addEventListener('click', function() {
   displayPlayerOptions(gameData);
   if (playGameButton.innerText !== 'NEW GAME') {
     resetScore(gameData);
+    subtitle.innerText = `Select your avatar & game!`;
   }
 });
 
@@ -388,10 +389,11 @@ function getWinHistoryFromLocalStorage(scoreHistory) {
 
 function clearScoreHistory(gameData) {
   localStorage.clear();
-  for (var i = 0; i < gameData.scoreHistory.length; i++) {
-    gameData.scoreHistory[i].wins = 0;
-    gameData.scoreHistory[i].loses = 0;
-  }
+  gameData.scoreHistory.forEach(score => {
+    score.wins = 0;
+    score.loses = 0;
+  });
+
   setScoreHistory(gameData);
   populateScoreHistory(gameData);
 }
